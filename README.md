@@ -19,7 +19,7 @@ Install
 
 Clone the source
 
-    git clone https://github.com/irahardianto/tennis-kata-go
+    git clone https://github.com/irahardianto/service-pattern-go
 
 Setup dependencies
 
