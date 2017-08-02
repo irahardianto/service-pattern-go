@@ -7,7 +7,6 @@ Inspired by Manuel Kiessling go-cleanarchitecture and Joshua Partogi TDD trainin
 
 It is written in Go using following library
 - Jinzhu GORM (ORM)
-- GoConvey (BDD style test framework)
 - Testify (Test & Mock framework)
 
 [http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/](http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/)
@@ -36,4 +35,5 @@ Run the app, and visit
     http://localhost:8080/getPlayer?playerId=101
 
 Cheers,
+
 M. Ichsan Rahardianto.
