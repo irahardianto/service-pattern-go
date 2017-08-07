@@ -13,17 +13,17 @@ It has simple dependencies:
 
 Get Started:
 
- - [Install](https://irahardianto.github.io/service-pattern-go#install)
- - [Introduction](https://irahardianto.github.io/service-pattern-go#introduction)
- - [Folder Structure](https://irahardianto.github.io/service-pattern-go#folder-structure)
- - [Naming Convention](https://irahardianto.github.io/service-pattern-go#naming-convention)
- - [Depency Injection](https://irahardianto.github.io/service-pattern-go#dependency-injection)
- - [Mocking](https://irahardianto.github.io/service-pattern-go#mocking)
+ - [Install](https://irahardianto.github.io/service-pattern-go/#install)
+ - [Introduction](https://irahardianto.github.io/service-pattern-go/#introduction)
+ - [Folder Structure](https://irahardianto.github.io/service-pattern-go/#folder-structure)
+ - [Naming Convention](https://irahardianto.github.io/service-pattern-go/#naming-convention)
+ - [Depency Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
+ - [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
 
 
 ----------
 
-[Install](https://irahardianto.github.io/service-pattern-go#install)
+[Install](https://irahardianto.github.io/service-pattern-go/#install)
 -------
 
 Clone the source
@@ -47,7 +47,7 @@ Run the app, and visit
 
 ----------
 
-[Introduction](https://irahardianto.github.io/service-pattern-go#introduction)
+[Introduction](https://irahardianto.github.io/service-pattern-go/#introduction)
 -------
 This is an example of Go clean architecture implementing Dependency Injection and Mocking for unit testing purposes to achieve safe, reliable and secure source code.
 
@@ -63,7 +63,22 @@ The aim of the architecture is to produce a system that are:
 Every implementation should only be by using interface, there should be no direct access from the implementor to implementation, that way we can inject its dependency and replace it with mock object during unit tests. For example:
 
  - PlayerController -> implement IPlayerService,  instead of direct PlayerService
+
+    type PlayerController struct {
+		PlayerService interfaces.IPlayerService
+	}
+
  - PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
+
+    type PlayerService struct {
+    	PlayerRepository interfaces.IPlayerRepository
+    }
+
+    func (repository *PlayerService) FindById(playerId int) models.Player {
+	player := repository.PlayerRepository.GetPlayerById(playerId)
+
+	return player
+    }
 
 This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
 
@@ -71,7 +86,7 @@ Router that is used should only the one that **net/http** compatible, that way w
 
 ----------
 
-[Folder Structure](https://irahardianto.github.io/service-pattern-go#folder-structure)
+[Folder Structure](https://irahardianto.github.io/service-pattern-go/#folder-structure)
 -------
     /
     |- controllers
@@ -105,7 +120,7 @@ Every folder is a namespace of their own, and every file / struct under the same
 
 ----------
 
-[Naming Convention](https://irahardianto.github.io/service-pattern-go#naming-convention)
+[Naming Convention](https://irahardianto.github.io/service-pattern-go/#naming-convention)
 -------
 - Namespace
 - Struct
@@ -116,13 +131,13 @@ Every folder is a namespace of their own, and every file / struct under the same
 
 ----------
 
-[Dependecy Injection](https://irahardianto.github.io/service-pattern-go#dependency-injection)
+[Dependecy Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
 -------
 
 
 ----------
 
-[Mocking](https://irahardianto.github.io/service-pattern-go#mocking)
+[Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
 -------
 
 Cheers,
