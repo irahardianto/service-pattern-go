@@ -1,20 +1,30 @@
 service-pattern-go
 -------
 
-An example Go application demonstrating The Clean Architecture, Dependency Injection & Mocking.
+Hey! welcome, this is and example of clean architecture written in Go Lang with complete Dependency Injection along with Mocking example.
 
-Inspired by Manuel Kiessling go-cleanarchitecture and Joshua Partogi TDD training session.
+Inspired by [Manuel Kiessling go-cleanarchitecture](http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/) and [Joshua Partogi TDD training session](https://github.com/jpartogi/tennis-kata-laravel/)
 
-It is written in Go using following library
-- Jinzhu GORM (ORM)
-- Testify (Test & Mock framework)
+It has simple dependencies:
 
-[http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/](http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/)
+ - [Gorilla Mux (Router)](https://github.com/gorilla/mux)
+ - [Jinzhu GORM (ORM)](https://github.com/jinzhu/gorm)
+ - [Testify (Test & Mock framework)](https://github.com/stretchr/testify)
 
-[https://github.com/jpartogi/tennis-kata-laravel/](https://github.com/jpartogi/tennis-kata-laravel/)
+Get Started:
+
+ - [Install](https://irahardianto.github.io/service-pattern-go#install)
+ - Introduction
+ - Folder Structure
+ - Naming Convention
+ - Depency Injection
+ - Mocking
 
 
-Install
+----------
+
+
+[Install](https://irahardianto.github.io/service-pattern-go#install)
 -------
 
 Clone the source
@@ -23,6 +33,7 @@ Clone the source
 
 Setup dependencies
 
+    go get -u github.com/gorilla/mux
     go get -u github.com/jinzhu/gorm
     go get github.com/stretchr/testify
 
@@ -34,6 +45,16 @@ Run the app, and visit
 
     http://localhost:8080/getPlayer?playerId=101
 
-Cheers,
 
+ - Naming Convention
+	 - Namespace
+	 - Struct
+	 - Interface
+	 - Service
+	 - Repository
+	 - Controller
+
+
+
+Cheers,
 M. Ichsan Rahardianto.
