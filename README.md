@@ -66,12 +66,14 @@ Every implementation should only be by using interface, there should be no direc
 
         type PlayerController struct {
           PlayerService interface.IPlayerService
+          PlayerHelper  helpers.PlayerHelper
         }
 
         func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
         	playerId, _ := strconv.Atoi(req.FormValue("playerId"))
         	player := controller.PlayerService.FindById(playerId)
         	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
+
           json.NewEncoder(res).Encode(playerVM)
         }
 
@@ -87,6 +89,15 @@ Every implementation should only be by using interface, there should be no direc
 
          return player
        }
+
+If you look into the implementation of these lines
+
+      player := controller.PlayerService.FindById(playerId)
+
+      player := repository.PlayerRepository.GetPlayerById(playerId)
+
+Both are actually abstract implementation of the interface, not the real implementation itself.
+So later on the Dependency Injection section, we will learn those interface will be injected with the implementation during the compile time.
 
 This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
 
