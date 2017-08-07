@@ -1,7 +1,7 @@
-# service-pattern-go
+service-pattern-go
 -------
 
-An example Go application demonstrating The Clean Architecture.
+An example Go application demonstrating The Clean Architecture, Dependency Injection & Mocking.
 
 Inspired by Manuel Kiessling go-cleanarchitecture and Joshua Partogi TDD training session.
 
