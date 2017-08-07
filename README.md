@@ -64,21 +64,19 @@ Every implementation should only be by using interface, there should be no direc
 
  - PlayerController -> implement IPlayerService,  instead of direct PlayerService
 
-    type PlayerController struct {
-		PlayerService interfaces.IPlayerService
-	}
+        type PlayerController struct {
+	        PlayerService interface.IPlayerService
+	    }
+
+        func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
+        	playerId, _ := strconv.Atoi(req.FormValue("playerId"))
+        	player := controller.PlayerService.FindById(playerId)
+        	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
+
+    		json.NewEncoder(res).Encode(playerVM)
+        }
 
  - PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
-
-    type PlayerService struct {
-    	PlayerRepository interfaces.IPlayerRepository
-    }
-
-    func (repository *PlayerService) FindById(playerId int) models.Player {
-	player := repository.PlayerRepository.GetPlayerById(playerId)
-
-	return player
-    }
 
 This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
 
