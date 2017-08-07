@@ -1,4 +1,4 @@
-# tennis-kata-go
+# service-pattern-go
 -------
 
 An example Go application demonstrating The Clean Architecture.
