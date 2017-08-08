@@ -1,9 +1,9 @@
 package interfaces
 
 import (
-  "service-pattern-go/models"
+	"service-pattern-go/models"
 )
 
 type IPlayerService interface {
-  FindById(playerId int) models.Player
+	FindById(playerId int) models.PlayerModel
 }

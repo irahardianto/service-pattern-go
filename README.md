@@ -40,9 +40,13 @@ Setup sqlite data structure
 
     sqlite3 /var/tmp/gorm.db < setup.sql
 
-Run the app, and visit
+Run the app
 
-    http://localhost:8080/getPlayer?playerId=101
+    go run main.go router.go servicecontainer.go
+
+and visit
+
+    http://localhost:8080/getPlayer/101
 
 
 ----------
@@ -106,7 +110,10 @@ Router that is used should only the one that **net/http** compatible, that way w
 [Folder Structure](https://irahardianto.github.io/service-pattern-go/#folder-structure)
 -------
     /
+    |- commands
+    |- configurations
     |- controllers
+    |- helpers
     |- infrastructures
     |- interfaces
     |- models
@@ -121,15 +128,27 @@ The folder structure is created to accomodate seperation of concern principle, w
 
 Every folder is a namespace of their own, and every file / struct under the same folder should only use the same namepace as their root folder.
 
-**infrasctructures**
+**commands**
 
-infrasctructures folder host all structs under infrasctructures namespace, infrasctructures consists of setup for the system to connect to external data source, it is used to host things like database connection configurations, MySQL, MariaDB, MongoDB, DynamoDB.
+commands folder hosts all the structs under commands namespace, commands are intended to run console app that don't need interaction like crons and daemon alike.
+
+**configurations**
+
+configurations folder hosts all the structs under configurations namespace, the folder should hold configurations of the systems, the environment variables, etc.
 
 **controllers**
 
 controllers folder hosts all the structs under controllers namespace, controllers are the handler of all requests coming in, to the router, its doing just that, business logic and data access layer should be done separately.
 
 controller struct implement services through their interface, no direct services implementation should be done in controller, this is done to maintain decoupled systems. The implementation will be injected during the compiled time.
+
+**helpers**
+
+controllers folder hosts all the structs under controllers namespace
+
+**infrasctructures**
+
+infrasctructures folder host all structs under infrasctructures namespace, infrasctructures consists of setup for the system to connect to external data source, it is used to host things like database connection configurations, MySQL, MariaDB, MongoDB, DynamoDB.
 
 **interfaces**
 
@@ -159,31 +178,29 @@ controller might implement many services interface to satisfy the request needs,
 
 **viewmodels**
 
-
+viewmodels folder hosts all the structs under viewmodels namespace, viewmodels are model to be use as a response return of REST API call
 
 **main.go**
 
-
+main.go is the entry point of our system, here lies the router bindings it triggers ChiRouter singleton and call InitRouter to bind the router.
 
 **router.go**
 
-
+router.go is where we binds controllers to appropriate route to handle desired http request.
 
 **servicecontainer.go**
 
-
+servicecontainer.go is where the magic begins, this is the place where we injected all implementations of interfaces.
 
 
 ----------
 
 [Naming Convention](https://irahardianto.github.io/service-pattern-go/#naming-convention)
 -------
-- Namespace
-- Struct
+- Folders & Namespaces
+- Files & Structs
 - Interface
-- Service
-- Repository
-- Controller
+- Main modules
 
 ----------
 

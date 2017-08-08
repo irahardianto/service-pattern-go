@@ -10,14 +10,14 @@ type IPlayerService struct {
 }
 
 // FindById provides a mock function with given fields: playerId
-func (_m *IPlayerService) FindById(playerId int) models.Player {
+func (_m *IPlayerService) FindById(playerId int) models.PlayerModel {
 	ret := _m.Called(playerId)
 
-	var r0 models.Player
-	if rf, ok := ret.Get(0).(func(int) models.Player); ok {
+	var r0 models.PlayerModel
+	if rf, ok := ret.Get(0).(func(int) models.PlayerModel); ok {
 		r0 = rf(playerId)
 	} else {
-		r0 = ret.Get(0).(models.Player)
+		r0 = ret.Get(0).(models.PlayerModel)
 	}
 
 	return r0

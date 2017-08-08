@@ -1,6 +1,6 @@
 package models
 
-type Player struct {
+type PlayerModel struct {
 	Id    int
 	Name  string
 	Score int

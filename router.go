@@ -10,9 +10,9 @@ type IChiRouter interface {
 	InitRouter() *chi.Mux
 }
 
-type muxRouter struct{}
+type router struct{}
 
-func (router *muxRouter) InitRouter() *chi.Mux {
+func (router *router) InitRouter() *chi.Mux {
 
 	playerController := ServiceContainer().InjectPlayerController()
 
@@ -23,14 +23,14 @@ func (router *muxRouter) InitRouter() *chi.Mux {
 }
 
 var (
-	m          *muxRouter
+	m          *router
 	routerOnce sync.Once
 )
 
-func ChiMuxRouter() IChiRouter {
+func ChiRouter() IChiRouter {
 	if m == nil {
 		routerOnce.Do(func() {
-			m = &muxRouter{}
+			m = &router{}
 		})
 	}
 	return m

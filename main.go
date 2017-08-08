@@ -10,7 +10,7 @@ func init() {
 
 func main() {
 
-	r := ChiMuxRouter().InitRouter()
+	r := ChiRouter().InitRouter()
 
 	http.ListenAndServe(":8080", r)
 }

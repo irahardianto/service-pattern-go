@@ -19,26 +19,26 @@ type PlayerRepository struct {
 // 	return dbHandler
 // }
 
-func (repository *PlayerRepository) GetAllPlayers() []models.Player {
+func (repository *PlayerRepository) GetAllPlayers() []models.PlayerModel {
 	//not implemented yet
 	return nil
 }
 
-func (repository *PlayerRepository) GetPlayerById(id int) models.Player {
+func (repository *PlayerRepository) GetPlayerById(id int) models.PlayerModel {
 	conn := repository.Db.GetDB()
-	player := models.Player{}
+	player := models.PlayerModel{}
 	//conn.db.First(&player, id)
 	conn.First(&player, id)
 
 	return player
 }
 
-func (repository *PlayerRepository) CreatePlayer(player models.Player) (bool, error) {
+func (repository *PlayerRepository) CreatePlayer(player models.PlayerModel) (bool, error) {
 	//not implemented yet
 	return false, nil
 }
 
-func (repository *PlayerRepository) UpdatePlayer(id int, player models.Player) (bool, error) {
+func (repository *PlayerRepository) UpdatePlayer(id int, player models.PlayerModel) (bool, error) {
 	//not implemented yet
 	return false, nil
 }

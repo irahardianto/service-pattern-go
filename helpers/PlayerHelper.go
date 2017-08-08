@@ -7,7 +7,7 @@ import (
 
 type PlayerHelper struct{}
 
-func (helper *PlayerHelper) BuildPlayerVM(model models.Player) viewmodels.PlayerVM {
+func (helper *PlayerHelper) BuildPlayerVM(model models.PlayerModel) viewmodels.PlayerVM {
 
 	playerVM := viewmodels.PlayerVM{}
 	playerVM.Name = model.Name

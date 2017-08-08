@@ -10,18 +10,18 @@ type IPlayerRepository struct {
 }
 
 // CreatePlayer provides a mock function with given fields: player
-func (_m *IPlayerRepository) CreatePlayer(player models.Player) (bool, error) {
+func (_m *IPlayerRepository) CreatePlayer(player models.PlayerModel) (bool, error) {
 	ret := _m.Called(player)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(models.Player) bool); ok {
+	if rf, ok := ret.Get(0).(func(models.PlayerModel) bool); ok {
 		r0 = rf(player)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(models.Player) error); ok {
+	if rf, ok := ret.Get(1).(func(models.PlayerModel) error); ok {
 		r1 = rf(player)
 	} else {
 		r1 = ret.Error(1)
@@ -52,15 +52,15 @@ func (_m *IPlayerRepository) DeletePlayer(id int) (bool, error) {
 }
 
 // GetAllPlayers provides a mock function with given fields:
-func (_m *IPlayerRepository) GetAllPlayers() []models.Player {
+func (_m *IPlayerRepository) GetAllPlayers() []models.PlayerModel {
 	ret := _m.Called()
 
-	var r0 []models.Player
-	if rf, ok := ret.Get(0).(func() []models.Player); ok {
+	var r0 []models.PlayerModel
+	if rf, ok := ret.Get(0).(func() []models.PlayerModel); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]models.Player)
+			r0 = ret.Get(0).([]models.PlayerModel)
 		}
 	}
 
@@ -68,32 +68,32 @@ func (_m *IPlayerRepository) GetAllPlayers() []models.Player {
 }
 
 // GetPlayerById provides a mock function with given fields: id
-func (_m *IPlayerRepository) GetPlayerById(id int) models.Player {
+func (_m *IPlayerRepository) GetPlayerById(id int) models.PlayerModel {
 	ret := _m.Called(id)
 
-	var r0 models.Player
-	if rf, ok := ret.Get(0).(func(int) models.Player); ok {
+	var r0 models.PlayerModel
+	if rf, ok := ret.Get(0).(func(int) models.PlayerModel); ok {
 		r0 = rf(id)
 	} else {
-		r0 = ret.Get(0).(models.Player)
+		r0 = ret.Get(0).(models.PlayerModel)
 	}
 
 	return r0
 }
 
 // UpdatePlayer provides a mock function with given fields: id, player
-func (_m *IPlayerRepository) UpdatePlayer(id int, player models.Player) (bool, error) {
+func (_m *IPlayerRepository) UpdatePlayer(id int, player models.PlayerModel) (bool, error) {
 	ret := _m.Called(id, player)
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(int, models.Player) bool); ok {
+	if rf, ok := ret.Get(0).(func(int, models.PlayerModel) bool); ok {
 		r0 = rf(id, player)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(int, models.Player) error); ok {
+	if rf, ok := ret.Get(1).(func(int, models.PlayerModel) error); ok {
 		r1 = rf(id, player)
 	} else {
 		r1 = ret.Error(1)

@@ -21,7 +21,7 @@ import (
 // make assertions about some target code we are testing.
 func TestGetScore(t *testing.T) {
 
-	player := models.Player{}
+	player := models.PlayerModel{}
 	player.Id = 101
 	player.Name = "Rafael"
 	player.Score = 3

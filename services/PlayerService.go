@@ -9,7 +9,7 @@ type PlayerService struct {
 	PlayerRepository interfaces.IPlayerRepository
 }
 
-func (repository *PlayerService) FindById(playerId int) models.Player {
+func (repository *PlayerService) FindById(playerId int) models.PlayerModel {
 
 	player := repository.PlayerRepository.GetPlayerById(playerId)
 
