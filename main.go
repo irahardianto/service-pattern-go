@@ -10,7 +10,7 @@ func init() {
 
 func main() {
 
-	r := GorillaMuxRouter().InitRouter()
+	r := ChiMuxRouter().InitRouter()
 
 	http.ListenAndServe(":8080", r)
 }

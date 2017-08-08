@@ -7,7 +7,7 @@ import (
 	"service-pattern-go/interfaces"
 	"strconv"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi"
 )
 
 type PlayerController struct {
@@ -17,8 +17,8 @@ type PlayerController struct {
 
 func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
 
-	vars := mux.Vars(req)
-	playerId, _ := strconv.Atoi(vars["id"])
+	//vars := mux.Vars(req)
+	playerId, _ := strconv.Atoi(chi.URLParam(req, "id"))
 	player := controller.PlayerService.FindById(playerId)
 	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
 

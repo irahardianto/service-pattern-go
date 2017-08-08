@@ -9,6 +9,7 @@ import (
 
 	"testing"
 
+	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -35,9 +36,13 @@ func TestGetScore(t *testing.T) {
 	playerController.PlayerService = playerService
 
 	// call the code we are testing
-	req := httptest.NewRequest("GET", "http://localhost:8080/getPlayer?playerId=101", nil)
+	req := httptest.NewRequest("GET", "http://localhost:8080/getPlayer/101", nil)
 	w := httptest.NewRecorder()
-	playerController.GetPlayer(w, req)
+
+	r := chi.NewRouter()
+	r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+
+	r.ServeHTTP(w, req)
 
 	expectedResult := viewmodels.PlayerVM{}
 	expectedResult.Name = "Rafael"

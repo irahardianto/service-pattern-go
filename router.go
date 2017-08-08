@@ -3,20 +3,20 @@ package main
 import (
 	"sync"
 
-	"github.com/gorilla/mux"
+	"github.com/go-chi/chi"
 )
 
-type IGorillaRouter interface {
-	InitRouter() *mux.Router
+type IChiRouter interface {
+	InitRouter() *chi.Mux
 }
 
 type muxRouter struct{}
 
-func (router *muxRouter) InitRouter() *mux.Router {
+func (router *muxRouter) InitRouter() *chi.Mux {
 
 	playerController := ServiceContainer().InjectPlayerController()
 
-	r := mux.NewRouter()
+	r := chi.NewRouter()
 	r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
 
 	return r
@@ -27,7 +27,7 @@ var (
 	routerOnce sync.Once
 )
 
-func GorillaMuxRouter() IGorillaRouter {
+func ChiMuxRouter() IChiRouter {
 	if m == nil {
 		routerOnce.Do(func() {
 			m = &muxRouter{}

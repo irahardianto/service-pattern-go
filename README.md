@@ -7,7 +7,7 @@ Inspired by [Manuel Kiessling go-cleanarchitecture](http://manuel.kiessling.net/
 
 It has simple dependencies:
 
- - [Gorilla Mux (Router)](https://github.com/gorilla/mux)
+ - [Chi (Router)](https://github.com/go-chi/chi)
  - [Jinzhu GORM (ORM)](https://github.com/jinzhu/gorm)
  - [Testify (Test & Mock framework)](https://github.com/stretchr/testify)
 
@@ -99,7 +99,7 @@ If you look into the implementation of these lines
 Both are actually abstract implementation of the interface, not the real implementation itself.
 So later on the Dependency Injection section, we will learn those interface will be injected with the implementation during the compile time. This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
 
-Router that is used should only the one that **net/http** compatible, that way we can use **net/http/httptest** to unit test our controllers and be sure that we have proper implementation, there are other routers that offers more performance, but if we have to test them with ServeHTTP function, that means we are doing integration tests instead of unit tests.
+Router that is used should only the one that **net/http** compatible, that way we can use **net/http/httptest** to unit test our controllers and be sure that we have proper implementation.
 
 ----------
 
