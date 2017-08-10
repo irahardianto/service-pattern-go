@@ -10,6 +10,7 @@ It has simple dependencies:
  - [Chi (Router)](https://github.com/go-chi/chi)
  - [Jinzhu GORM (ORM)](https://github.com/jinzhu/gorm)
  - [Testify (Test & Mock framework)](https://github.com/stretchr/testify)
+ - [Mockery (Mock generator)](https://github.com/vektra/mockery)
 
 Get Started:
 
@@ -36,6 +37,7 @@ Setup dependencies
     go get -u github.com/gorilla/mux
     go get -u github.com/jinzhu/gorm
     go get github.com/stretchr/testify
+    go get github.com/vektra/mockery/.../
 
 Setup sqlite data structure
 
@@ -301,7 +303,7 @@ You see, in PlayerController_test.go we are using mock object to inject the impl
 [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
 -------
 
-Mocking is a concept many times people struggle to understand, let alone implement it, at least I am the one among the one struggle to understand this concept. But understanding this concept is essential to do TDD.
+Mocking is a concept many times people struggle to understand, let alone implement it, at least I am the one among the one struggle to understand this concept. But understanding this concept is essential to do TDD. We are using testfy as our mock library.
 
 Basically what mock object do is replacing injection instead of real implementation with mock as point out at the end of dependency injection session
 
@@ -316,12 +318,69 @@ As you see, then the mock object is injected to **playerService** of PlayerContr
         playerController := PlayerController{}
         playerController.PlayerService = playerService
 
+We generate mock our by using vektra mockery for IPlayerService, go to the interfaces folder and then just type.
+
+        mockery -name=IPlayerService
+
+The output will be inside ```mocks/IPlayerService.go``` and we can use it right away for our testing.
+
 ----------
 
 [Testing](https://irahardianto.github.io/service-pattern-go/#testing)
 -------
 
+We have cover pretty much everything there is I hope that you already get the idea of proper unit testing and why we should implement interfaces, dependency injection and mocking. The last piece is the unit test itself.
 
+        func TestGetScore(t *testing.T) {
+
+        	player := models.PlayerModel{}
+        	player.Id = 101
+        	player.Name = "Rafael"
+        	player.Score = 3
+
+        	// create an instance of our test object
+        	playerService := new(mocks.IPlayerService)
+
+        	// setup expectations
+        	playerService.On("FindById", 101).Return(player)
+
+        	playerController := PlayerController{}
+        	playerController.PlayerService = playerService
+
+        	// call the code we are testing
+        	req := httptest.NewRequest("GET", "http://localhost:8080/getPlayer/101", nil)
+        	w := httptest.NewRecorder()
+
+        	r := chi.NewRouter()
+        	r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+
+        	r.ServeHTTP(w, req)
+
+        	expectedResult := viewmodels.PlayerVM{}
+        	expectedResult.Name = "Rafael"
+        	expectedResult.Score = 3
+
+        	actualResult := viewmodels.PlayerVM{}
+
+        	json.NewDecoder(w.Body).Decode(&actualResult)
+
+        	// assert that the expectations were met
+        	assert.Equal(t, expectedResult, actualResult)
+        }
+
+ As you see here after injecting playerService of playerController with mock object, we are calling the playerController.GetPlayer and simulate request all the way from the router.
+
+        req := httptest.NewRequest("GET", "http://localhost:8080/getPlayer/101", nil)
+        w := httptest.NewRecorder()
+
+        r := chi.NewRouter()
+        r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+
+        r.ServeHTTP(w, req)
+
+And assert the result by using testify assertion library
+
+        assert.Equal(t, expectedResult, actualResult)
 
 Cheers,
 M. Ichsan Rahardianto.
