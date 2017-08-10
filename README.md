@@ -1,7 +1,7 @@
 service-pattern-go
 -------
 
-Hey! welcome, this is and example of simple clean architecture written in Go Lang with complete Dependency Injection along with Mocking example.
+Hey! welcome, this is an example of simple REST API implementation with clean architecture written in Go Lang with complete Dependency Injection along with Mocking example.
 
 Inspired by [Manuel Kiessling go-cleanarchitecture](http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/) and [Joshua Partogi TDD training session](https://github.com/jpartogi/tennis-kata-laravel/)
 
@@ -34,7 +34,7 @@ Clone the source
 
 Setup dependencies
 
-    go get -u github.com/gorilla/mux
+    go get -u github.com/go-chi/chi
     go get -u github.com/jinzhu/gorm
     go get github.com/stretchr/testify
     go get github.com/vektra/mockery/.../
@@ -193,7 +193,7 @@ main.go is the entry point of our system, here lies the router bindings it trigg
 
 ### router.go
 
-router.go is where we binds controllers to appropriate route to handle desired http request.
+router.go is where we binds controllers to appropriate route to handle desired http request. By default we are using Chi router as it is a light weight router and not bloated with unnecessary unwanted features.
 
 ### servicecontainer.go
 
