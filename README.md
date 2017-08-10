@@ -203,9 +203,42 @@ servicecontainer.go is where the magic begins, this is the place where we inject
 [Naming Convention](https://irahardianto.github.io/service-pattern-go/#naming-convention)
 -------
 - Folders & Namespaces
-- Files & Structs
+
+  Folder naming must be :
+  1. Descriptive
+  2. Prefer short than long word
+
+- Files
+
+  Files naming must be :
+  1. Use mixedCaps with first uppercase, eg : DateTime.go, not dateTime.go, String.go not string.go
+  2. Interface function file name must be follow by "I" character, match with interface function declaration eg : IConnection, IRewardsService
+  3. Descriptive, file name must be describe what it's functions.  
+  4. Follow SRP (Single Responsibility Priciple), File name is the first time to look before reach the code inside, don't mixed String with DateTime.
+
+- Struct
+
+  There are two kind of struct in declaration, first declaring data model and last one wiring things. 
+
 - Interface
+
+  Interface name must be start with "I" character, for example "IConnection", "IRewardService".  
+
+- Variable declaration
+
+  Variable names should be short rather than long. This is especially true for local variables with limited scope. Prefer c to lineCount. Prefer i to sliceIndex. For other variable use mixedCaps (eg : GlobalVariable, privateVariable)
+
+- Functions
+
+  Function names must be as descriptive as possible, don't use long word if not necessary. Same as declaring variable, function name must be use mixedCaps
+
 - Main modules
+
+----------
+
+[Commentary](https://irahardianto.github.io/service-pattern-go/#commentary)
+------
+
 
 ----------
 
