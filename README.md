@@ -133,29 +133,29 @@ The folder structure is created to accomodate seperation of concern principle, w
 
 Every folder is a namespace of their own, and every file / struct under the same folder should only use the same namepace as their root folder.
 
-**commands**
+### commands
 
 commands folder hosts all the structs under commands namespace, commands are intended to run console app that don't need interaction like crons and daemon alike.
 
-**configurations**
+### configurations
 
 configurations folder hosts all the structs under configurations namespace, the folder should hold configurations of the systems, the environment variables, etc.
 
-**controllers**
+### controllers
 
 controllers folder hosts all the structs under controllers namespace, controllers are the handler of all requests coming in, to the router, its doing just that, business logic and data access layer should be done separately.
 
 controller struct implement services through their interface, no direct services implementation should be done in controller, this is done to maintain decoupled systems. The implementation will be injected during the compiled time.
 
-**helpers**
+### helpers
 
 controllers folder hosts all the structs under controllers namespace
 
-**infrasctructures**
+### infrasctructures
 
 infrasctructures folder host all structs under infrasctructures namespace, infrasctructures consists of setup for the system to connect to external data source, it is used to host things like database connection configurations, MySQL, MariaDB, MongoDB, DynamoDB.
 
-**interfaces**
+### interfaces
 
 interfaces folder hosts all the structs under interfaces namespace, interfaces as the name suggest are the bridge between different domain so they can interact with each other, in our case, this should be the only way for them to interact.
 
@@ -167,33 +167,33 @@ The same thing applies on PlayerService which implements IPlayerRepository to be
 
 PlayerRepository on the other hand, will be injected with infrasctructure configuration that has been setup earlier, this ensure that you can change the implementation of PlayerRepository, without changing the implementor which in this case PlayerService let alone break it. The same thing goes to PlayerService and PlayerController relationship, we can refactor PlayerService, we can change it however we want, without touching the implementor which is PlayerController.
 
-**models**
+### models
 
 models folder hosts all structs under models namespace, model is a struct reflecting our data object from / to database. models should only define data structs, no other functionalities should be included here.
 
-**repositories**
+### repositories
 
 repositories folder hosts all structs under repositories namespace, repositories is where the implementation of data access layer. All queries and data operation from / to database should happen here, and the implementor should be agnostic of what is the database engine is used, how the queries is done, all they care is they can pull the data according to the interface they are implementing.
 
-**services**
+### services
 
 services folder hosts all structs under services namespace, services is where the business logic lies on, it handles controller request and fetch data from data layer it needs and run their logic to satisfy what controller expect the service to return.
 
 controller might implement many services interface to satisfy the request needs, and controller should be agnostic of how services implements their logic, all they care is that they should be able to pull the result they need according to the interface they implements.
 
-**viewmodels**
+### viewmodels
 
 viewmodels folder hosts all the structs under viewmodels namespace, viewmodels are model to be use as a response return of REST API call
 
-**main.go**
+### main.go
 
 main.go is the entry point of our system, here lies the router bindings it triggers ChiRouter singleton and call InitRouter to bind the router.
 
-**router.go**
+### router.go
 
 router.go is where we binds controllers to appropriate route to handle desired http request.
 
-**servicecontainer.go**
+### servicecontainer.go
 
 servicecontainer.go is where the magic begins, this is the place where we injected all implementations of interfaces. Lets cover throughly in the dependency injection section.
 
@@ -218,7 +218,7 @@ servicecontainer.go is where the magic begins, this is the place where we inject
 
 - Struct
 
-  There are two kind of struct in declaration, first declaring data model and last one wiring things. 
+  There are two kind of struct in declaration, first declaring data model and last one wiring things.
 
 - Interface
 
@@ -236,12 +236,6 @@ servicecontainer.go is where the magic begins, this is the place where we inject
 
 ----------
 
-[Commentary](https://irahardianto.github.io/service-pattern-go/#commentary)
-------
-
-
-----------
-
 [Dependecy Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
 -------
 
@@ -256,21 +250,21 @@ Some other people says that interface is used so your program is decoupled, and 
 The when I learned about mocking, all that I have been asking coming to conclusions as if I was like having epiphany, we will discuss more about mocking in the mocking section, but for now lets discuss it in regards of dependency injection usage. So as you see in our project structure, instead of having all component directly talks to each other, we are using interface, take PlayerController for example
 
         type PlayerController struct {
-          **PlayerService interfaces.IPlayerService**
+          ```PlayerService interfaces.IPlayerService```
           PlayerHelper  helpers.PlayerHelper
         }
 
         func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
 
         	playerId, _ := strconv.Atoi(chi.URLParam(req, "id"))
-        	**player := controller.PlayerService.FindById(playerId)**
+        	```player := controller.PlayerService.FindById(playerId)```
         	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
 
         	json.NewEncoder(res).Encode(playerVM)
         }
 
         type IPlayerService interface {
-        	**FindById(playerId int) models.PlayerModel**
+        	```FindById(playerId int) models.PlayerModel```
         }
 
 You see that PlayerController uses IPlayerService interface, and since IPlayerService has FindById method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
@@ -289,7 +283,7 @@ You see, instead of calling directly to PlayerService, PlayerController uses the
           playerService.PlayerRepository = playerRepository
 
           playerController := controllers.PlayerController{}
-          **playerController.PlayerService = playerService**
+          ```playerController.PlayerService = playerService```
 
           return playerController
         }
