@@ -19,6 +19,7 @@ Get Started:
  - [Naming Convention](https://irahardianto.github.io/service-pattern-go/#naming-convention)
  - [Depency Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
  - [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
+ - [Testing](https://irahardianto.github.io/service-pattern-go/#testing)
 
 
 ----------
@@ -40,11 +41,15 @@ Setup sqlite data structure
 
     sqlite3 /var/tmp/gorm.db < setup.sql
 
+Test first for your liking
+
+    go test ./... -v
+
 Run the app
 
     go run main.go router.go servicecontainer.go
 
-and visit
+And visit
 
     http://localhost:8080/getPlayer/101
 
@@ -190,7 +195,7 @@ router.go is where we binds controllers to appropriate route to handle desired h
 
 **servicecontainer.go**
 
-servicecontainer.go is where the magic begins, this is the place where we injected all implementations of interfaces.
+servicecontainer.go is where the magic begins, this is the place where we injected all implementations of interfaces. Lets cover throughly in the dependency injection section.
 
 
 ----------
@@ -207,10 +212,72 @@ servicecontainer.go is where the magic begins, this is the place where we inject
 [Dependecy Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
 -------
 
+Dependecy injection is the heart of TDD, without it we wont be able to do proper TDD because there will be no mocking and we cannot decoupled our code properly. This is one of the misconception when people thinks that they are doing unit testing instead actually they are doing integration test which connects the logic to database. Unit test should be done independently and database should not come in to play when we are doing unit test. One thing to not though, in Go dependency has to be injected during compile time instead of runtime which cause it a bit different than Java / C# implementation, but anyway, its just plain old dependency injection.
+
+In essence unit test is created to test our logic not our data integrity, and by taking database during unit testing it will add huge complexity to the tests itself, and this creates barrier for programmers new to unit testing as they are struggling to create proper testing for their functions.
+
+Now why dependency injection is a crucial part in doing proper TDD? the answer lies in the usage of interface. Back when I have never encountered mocking, I always wondering, what is the use of interface, why we should create abstraction for our functions instead of just write it all already, why the hell should we create a duplicate, abstraction that we will be implementing shortly anyway, some says that, because in doing so, your code will be much cleaner and we have proper pattern, I called that bullshit because in essence we dont have to do it if it only for that reason, and I'm still wondering until I learned about mocking.
+
+Some other people says that interface is used so your program is decoupled, and when needed you can replace the implementations without needing to adjust the implementor. That make sense right? much better than the bullshit. Yea that make sense, we can replace whatever implement whatever interface with whatever. Yea, but how many times would you replace you database connection calls? chances are rare if not never especially if you working on software house that deliver projects after projects after projects, you will never see you component got replaced.
+
+The when I learned about mocking, all that I have been asking coming to conclusions as if I was like having epiphany, we will discuss more about mocking in the mocking section, but for now lets discuss it in regards of dependency injection usage. So as you see in our project structure, instead of having all component directly talks to each other, we are using interface, take PlayerController for example
+
+        type PlayerController struct {
+          **PlayerService interfaces.IPlayerService**
+          PlayerHelper  helpers.PlayerHelper
+        }
+
+        func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
+
+        	playerId, _ := strconv.Atoi(chi.URLParam(req, "id"))
+        	**player := controller.PlayerService.FindById(playerId)**
+        	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
+
+        	json.NewEncoder(res).Encode(playerVM)
+        }
+
+        type IPlayerService interface {
+        	**FindById(playerId int) models.PlayerModel**
+        }
+
+You see that PlayerController uses IPlayerService interface, and since IPlayerService has FindById method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
+
+You see, instead of calling directly to PlayerService, PlayerController uses the interface of PlayerService which is IPlayerService, there could be many implementation of IPlayerService not just limited to PlayerService it could be BrotherService etc, but how do we determined that PlayerService will be used instead?
+
+        func (k *kernel) InjectPlayerController() controllers.PlayerController {
+
+          sqlconn := new(infrastructures.SqlConnection)
+          sqlconn.InitDB()
+
+          playerRepository := new(repositories.PlayerRepository)
+          playerRepository.Db.Db = sqlconn.GetDB()
+
+          playerService := new(services.PlayerService)
+          playerService.PlayerRepository = playerRepository
+
+          playerController := controllers.PlayerController{}
+          **playerController.PlayerService = playerService**
+
+          return playerController
+        }
+
+This is where dependency injection come in to play, as you see here in servicecontainer.go we are creating **playerController** and then inject it with **playerService** as simple as that, this is what dependency injection all about no more. So **playerController.PlayerService** interface will be injected by **playerService** along with all implementation that it implements, so for example FindById now returns whatever FindById implemented by **playerService** as you can see it in PlayerService.go
+
+Now, how does this relates to TDD & mocking?
+
+        playerService := new(mocks.IPlayerService)
+
+You see, in PlayerController_test.go we are using mock object to inject the implementation of our service, lets discuss more detail about mocking and testing in each section.
 
 ----------
 
 [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
+-------
+
+
+----------
+
+[Testing](https://irahardianto.github.io/service-pattern-go/#testing)
 -------
 
 Cheers,
