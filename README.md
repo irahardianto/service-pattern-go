@@ -250,24 +250,24 @@ Some other people says that interface is used so your program is decoupled, and 
 The when I learned about mocking, all that I have been asking coming to conclusions as if I was like having epiphany, we will discuss more about mocking in the mocking section, but for now lets discuss it in regards of dependency injection usage. So as you see in our project structure, instead of having all component directly talks to each other, we are using interface, take PlayerController for example
 
         type PlayerController struct {
-          ```PlayerService interfaces.IPlayerService```
+          PlayerService interfaces.IPlayerService
           PlayerHelper  helpers.PlayerHelper
         }
 
         func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
 
         	playerId, _ := strconv.Atoi(chi.URLParam(req, "id"))
-        	```player := controller.PlayerService.FindById(playerId)```
+        	player := controller.PlayerService.FindById(playerId
         	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
 
         	json.NewEncoder(res).Encode(playerVM)
         }
 
-        type IPlayerService interface {
-        	```FindById(playerId int) models.PlayerModel```
-        }
-
 You see that PlayerController uses IPlayerService interface, and since IPlayerService has FindById method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
+
+        type IPlayerService interface {
+          FindById(playerId int) models.PlayerModel
+        }
 
 You see, instead of calling directly to PlayerService, PlayerController uses the interface of PlayerService which is IPlayerService, there could be many implementation of IPlayerService not just limited to PlayerService it could be BrotherService etc, but how do we determined that PlayerService will be used instead?
 
@@ -283,7 +283,7 @@ You see, instead of calling directly to PlayerService, PlayerController uses the
           playerService.PlayerRepository = playerRepository
 
           playerController := controllers.PlayerController{}
-          ```playerController.PlayerService = playerService```
+          playerController.PlayerService = playerService
 
           return playerController
         }
