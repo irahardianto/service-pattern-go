@@ -301,11 +301,27 @@ You see, in PlayerController_test.go we are using mock object to inject the impl
 [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
 -------
 
+Mocking is a concept many times people struggle to understand, let alone implement it, at least I am the one among the one struggle to understand this concept. But understanding this concept is essential to do TDD.
+
+Basically what mock object do is replacing injection instead of real implementation with mock as point out at the end of dependency injection session
+
+        playerService := new(mocks.IPlayerService)
+
+We then create mock FindById functionalities along with its request and response.
+
+        playerService.On("FindById", 101).Return(player)
+
+As you see, then the mock object is injected to **playerService** of PlayerController, this is why dependency injection is essential to this proses as it is the only way we can inject interface with mock object instead of real implementation.
+
+        playerController := PlayerController{}
+        playerController.PlayerService = playerService
 
 ----------
 
 [Testing](https://irahardianto.github.io/service-pattern-go/#testing)
 -------
+
+
 
 Cheers,
 M. Ichsan Rahardianto.
