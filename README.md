@@ -11,6 +11,7 @@ It has simple dependencies:
  - [Jinzhu GORM (ORM)](https://github.com/jinzhu/gorm)
  - [Testify (Test & Mock framework)](https://github.com/stretchr/testify)
  - [Mockery (Mock generator)](https://github.com/vektra/mockery)
+ - [Hystrix-Go (Circuit Breaker)](https://github.com/afex/hystrix-go)
 
 Get Started:
 
@@ -21,6 +22,7 @@ Get Started:
  - [Depency Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
  - [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
  - [Testing](https://irahardianto.github.io/service-pattern-go/#testing)
+ - [Circuit Breaker](https://irahardianto.github.io/service-pattern-go/#circuit-breaker)
 
 
 ----------
@@ -38,6 +40,7 @@ Setup dependencies
     go get -u github.com/jinzhu/gorm
     go get github.com/stretchr/testify
     go get github.com/vektra/mockery/.../
+    go get github.com/afex/hystrix-go/hystrix
 
 Setup sqlite data structure
 
