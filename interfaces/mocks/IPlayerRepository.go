@@ -81,6 +81,20 @@ func (_m *IPlayerRepository) GetPlayerById(id int) models.PlayerModel {
 	return r0
 }
 
+// GetPlayerMessageFromAPI provides a mock function with given fields:
+func (_m *IPlayerRepository) GetPlayerMessageFromAPI() models.MessageModel {
+	ret := _m.Called()
+
+	var r0 models.MessageModel
+	if rf, ok := ret.Get(0).(func() models.MessageModel); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(models.MessageModel)
+	}
+
+	return r0
+}
+
 // UpdatePlayer provides a mock function with given fields: id, player
 func (_m *IPlayerRepository) UpdatePlayer(id int, player models.PlayerModel) (bool, error) {
 	ret := _m.Called(id, player)

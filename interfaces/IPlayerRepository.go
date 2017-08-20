@@ -10,4 +10,5 @@ type IPlayerRepository interface {
 	CreatePlayer(player models.PlayerModel) (bool, error)
 	UpdatePlayer(id int, player models.PlayerModel) (bool, error)
 	DeletePlayer(id int) (bool, error)
+	GetPlayerMessageFromAPI() models.MessageModel
 }

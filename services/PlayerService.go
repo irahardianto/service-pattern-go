@@ -9,9 +9,16 @@ type PlayerService struct {
 	PlayerRepository interfaces.IPlayerRepository
 }
 
-func (repository *PlayerService) FindById(playerId int) models.PlayerModel {
+func (service *PlayerService) FindById(playerId int) models.PlayerModel {
 
-	player := repository.PlayerRepository.GetPlayerById(playerId)
+	player := service.PlayerRepository.GetPlayerById(playerId)
 
 	return player
+}
+
+func (service *PlayerService) GetPlayerMessage() models.MessageModel {
+
+	data := service.PlayerRepository.GetPlayerMessageFromAPI()
+
+	return data
 }

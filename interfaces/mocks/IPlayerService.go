@@ -22,3 +22,17 @@ func (_m *IPlayerService) FindById(playerId int) models.PlayerModel {
 
 	return r0
 }
+
+// GetPlayerMessage provides a mock function with given fields:
+func (_m *IPlayerService) GetPlayerMessage() models.MessageModel {
+	ret := _m.Called()
+
+	var r0 models.MessageModel
+	if rf, ok := ret.Get(0).(func() models.MessageModel); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(models.MessageModel)
+	}
+
+	return r0
+}

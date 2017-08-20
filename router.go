@@ -18,6 +18,7 @@ func (router *router) InitRouter() *chi.Mux {
 
 	r := chi.NewRouter()
 	r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+	r.HandleFunc("/getMessage", playerController.GetPlayerMessage)
 
 	return r
 }

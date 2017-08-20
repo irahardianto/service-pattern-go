@@ -6,4 +6,5 @@ import (
 
 type IPlayerService interface {
 	FindById(playerId int) models.PlayerModel
+	GetPlayerMessage() models.MessageModel
 }

@@ -303,7 +303,7 @@ You see, in PlayerController_test.go we are using mock object to inject the impl
 [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
 -------
 
-Mocking is a concept many times people struggle to understand, let alone implement it, at least I am the one among the one struggle to understand this concept. But understanding this concept is essential to do TDD. We are using testfy as our mock library.
+Mocking is a concept many times people struggle to understand, let alone implement it, at least I am the one among the one struggle to understand this concept. But understanding this concept is essential to do TDD. The key point is, we mock dependencies that we need to run our tests, this is why dependency injection is essential to proceed. We are using testfy as our mock library
 
 Basically what mock object do is replacing injection instead of real implementation with mock as point out at the end of dependency injection session
 
