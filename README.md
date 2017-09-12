@@ -78,37 +78,71 @@ Every implementation should only be by using interface, there should be no direc
 
  - PlayerController -> implement IPlayerService,  instead of direct PlayerService
 
-        type PlayerController struct {
-          PlayerService interface.IPlayerService
-          PlayerHelper  helpers.PlayerHelper
-        }
+     type PlayerController struct {
+     	PlayerService interfaces.IPlayerService
+     	PlayerHelper  helpers.PlayerHelper
+     }
 
-        func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
-        	playerId, _ := strconv.Atoi(req.FormValue("playerId"))
-        	player := controller.PlayerService.FindById(playerId)
-        	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
+     func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
 
-          json.NewEncoder(res).Encode(playerVM)
-        }
+     	player1Name := chi.URLParam(req, "player1")
+     	player2Name := chi.URLParam(req, "player2")
+
+     	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+     	if err != nil {
+     		//Handle error
+     	}
+
+     	response := controller.PlayerHelper.BuildScoresVM(scores)
+
+     	json.NewEncoder(res).Encode(response)
+     }
 
  - PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
-       type PlayerService struct {
-         PlayerRepository interfaces.IPlayerRepository
-       }
+     type PlayerService struct {
+      PlayerRepository interfaces.IPlayerRepository
+     }
 
-       func (repository *PlayerService) FindById(playerId int) models.Player {
+     func (service *PlayerService) GetScores(player1Name string, player2Name string) (string, error) {
 
-         player := repository.PlayerRepository.GetPlayerById(playerId)
+      baseScore := [4]string{"Love", "Fifteen", "Thirty", "Forty"}
+      var result string
 
-         return player
-       }
+      player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
+      if err != nil {
+        //Handle error
+      }
+
+      player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
+      if err != nil {
+        //Handle error
+      }
+
+      if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
+
+        s := baseScore[player1.Score]
+
+        if player1.Score == player2.Score {
+          result = s + "-All"
+        } else {
+          result = s + "-" + baseScore[player2.Score]
+        }
+      }
+
+      if player1.Score == player2.Score {
+        result = "Deuce"
+      }
+
+      return result, nil
+     }
 
 If you look into the implementation of these lines
 
-      player := controller.PlayerService.FindById(playerId)
+      scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
 
-      player := repository.PlayerRepository.GetPlayerById(playerId)
+      player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
+      player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
 
 Both are actually abstract implementation of the interface, not the real implementation itself.
 So later on the Dependency Injection section, we will learn those interface will be injected with the implementation during the compile time. This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
@@ -254,25 +288,32 @@ Some other people says that interface is used so your program is decoupled, and 
 
 The when I learned about mocking, all that I have been asking coming to conclusions as if I was like having epiphany, we will discuss more about mocking in the mocking section, but for now lets discuss it in regards of dependency injection usage. So as you see in our project structure, instead of having all component directly talks to each other, we are using interface, take PlayerController for example
 
-        type PlayerController struct {
-          PlayerService interfaces.IPlayerService
-          PlayerHelper  helpers.PlayerHelper
-        }
+    type PlayerController struct {
+     PlayerService interfaces.IPlayerService
+     PlayerHelper  helpers.PlayerHelper
+    }
 
-        func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
+    func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
 
-        	playerId, _ := strconv.Atoi(chi.URLParam(req, "id"))
-        	player := controller.PlayerService.FindById(playerId
-        	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
+     player1Name := chi.URLParam(req, "player1")
+     player2Name := chi.URLParam(req, "player2")
 
-        	json.NewEncoder(res).Encode(playerVM)
-        }
+     scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+     if err != nil {
+       //Handle error
+     }
 
-You see that PlayerController uses IPlayerService interface, and since IPlayerService has FindById method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
+     response := controller.PlayerHelper.BuildScoresVM(scores)
 
-        type IPlayerService interface {
-          FindById(playerId int) models.PlayerModel
-        }
+     json.NewEncoder(res).Encode(response)
+    }
+
+You see that PlayerController uses IPlayerService interface, and since IPlayerService has GetScores method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
+
+    type IPlayerService interface {
+    	GetScores(player1Name string, player2Name string) (string, error)
+    	GetPlayerMessage() models.MessageModel
+    }
 
 You see, instead of calling directly to PlayerService, PlayerController uses the interface of PlayerService which is IPlayerService, there could be many implementation of IPlayerService not just limited to PlayerService it could be BrotherService etc, but how do we determined that PlayerService will be used instead?
 
@@ -312,9 +353,9 @@ Basically what mock object do is replacing injection instead of real implementat
 
         playerService := new(mocks.IPlayerService)
 
-We then create mock FindById functionalities along with its request and response.
+We then create mock GetScores functionalities along with its request and response.
 
-        playerService.On("FindById", 101).Return(player)
+      	playerService.On("GetScores", "Rafael", "Serena").Return("Forty-Fifteen", nil)
 
 As you see, then the mock object is injected to **playerService** of PlayerController, this is why dependency injection is essential to this proses as it is the only way we can inject interface with mock object instead of real implementation.
 
@@ -334,56 +375,55 @@ The output will be inside ```mocks/IPlayerService.go``` and we can use it right 
 
 We have cover pretty much everything there is I hope that you already get the idea of proper unit testing and why we should implement interfaces, dependency injection and mocking. The last piece is the unit test itself.
 
-        func TestGetScore(t *testing.T) {
+    func TestPlayerScore(t *testing.T) {
 
-        	player := models.PlayerModel{}
-        	player.Id = 101
-        	player.Name = "Rafael"
-        	player.Score = 3
+    	// create an instance of our test object
+    	playerService := new(mocks.IPlayerService)
 
-        	// create an instance of our test object
-        	playerService := new(mocks.IPlayerService)
+    	// setup expectations
+    	playerService.On("GetScores", "Rafael", "Serena").Return("Forty-Fifteen", nil)
 
-        	// setup expectations
-        	playerService.On("FindById", 101).Return(player)
+    	playerController := PlayerController{}
+    	playerController.PlayerService = playerService
 
-        	playerController := PlayerController{}
-        	playerController.PlayerService = playerService
+    	// call the code we are testing
+    	req := httptest.NewRequest("GET", "http://localhost:8080/getScore/Rafael/vs/Serena", nil)
+    	w := httptest.NewRecorder()
 
-        	// call the code we are testing
-        	req := httptest.NewRequest("GET", "http://localhost:8080/getPlayer/101", nil)
-        	w := httptest.NewRecorder()
+    	r := chi.NewRouter()
+    	r.HandleFunc("/getScore/{player1}/vs/{player2}", playerController.GetPlayerScore)
 
-        	r := chi.NewRouter()
-        	r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+    	r.ServeHTTP(w, req)
 
-        	r.ServeHTTP(w, req)
+    	expectedResult := viewmodels.ScoresVM{}
+    	expectedResult.Score = "Forty-Fifteen"
 
-        	expectedResult := viewmodels.PlayerVM{}
-        	expectedResult.Name = "Rafael"
-        	expectedResult.Score = 3
+    	actualResult := viewmodels.ScoresVM{}
 
-        	actualResult := viewmodels.PlayerVM{}
+    	json.NewDecoder(w.Body).Decode(&actualResult)
 
-        	json.NewDecoder(w.Body).Decode(&actualResult)
-
-        	// assert that the expectations were met
-        	assert.Equal(t, expectedResult, actualResult)
-        }
+    	// assert that the expectations were met
+    	assert.Equal(t, expectedResult, actualResult)
+    }
 
  As you see here after injecting playerService of playerController with mock object, we are calling the playerController.GetPlayer and simulate request all the way from the router.
 
-        req := httptest.NewRequest("GET", "http://localhost:8080/getPlayer/101", nil)
-        w := httptest.NewRecorder()
+     req := httptest.NewRequest("GET", "http://localhost:8080/getScore/Rafael/vs/Serena", nil)
+     w := httptest.NewRecorder()
 
-        r := chi.NewRouter()
-        r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+     r := chi.NewRouter()
+     r.HandleFunc("/getScore/{player1}/vs/{player2}", playerController.GetPlayerScore)
 
-        r.ServeHTTP(w, req)
+     r.ServeHTTP(w, req)
 
 And assert the result by using testify assertion library
 
-        assert.Equal(t, expectedResult, actualResult)
+      assert.Equal(t, expectedResult, actualResult)
+
+----------
+
+[Circuit Breaker](https://irahardianto.github.io/service-pattern-go/#circuit-breaker)
+-------
 
 Cheers,
 M. Ichsan Rahardianto.

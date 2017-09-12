@@ -5,7 +5,6 @@ import (
 	"net/http/httptest"
 
 	"github.com/irahardianto/service-pattern-go/interfaces/mocks"
-	"github.com/irahardianto/service-pattern-go/models"
 	"github.com/irahardianto/service-pattern-go/viewmodels"
 
 	"testing"
@@ -21,11 +20,6 @@ import (
 // TestSomething is an example of how to use our test object to
 // make assertions about some target code we are testing.
 func TestPlayerScore(t *testing.T) {
-
-	player := models.PlayerModel{}
-	player.Id = 101
-	player.Name = "Rafael"
-	player.Score = 3
 
 	// create an instance of our test object
 	playerService := new(mocks.IPlayerService)
