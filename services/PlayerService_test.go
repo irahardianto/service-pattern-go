@@ -1,9 +1,10 @@
 package services
 
 import (
-	"service-pattern-go/interfaces/mocks"
-	"service-pattern-go/models"
 	"testing"
+
+	"github.com/irahardianto/service-pattern-go/interfaces/mocks"
+	"github.com/irahardianto/service-pattern-go/models"
 
 	"github.com/stretchr/testify/assert"
 )

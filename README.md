@@ -52,7 +52,7 @@ Test first for your liking
 
 Run the app
 
-    go run main.go router.go servicecontainer.go
+    go get github.com/mattn/go-sqlite3
 
 And visit
 

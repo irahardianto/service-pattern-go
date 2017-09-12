@@ -1,8 +1,8 @@
 package services
 
 import (
-	"service-pattern-go/interfaces"
-	"service-pattern-go/models"
+	"github.com/irahardianto/service-pattern-go/interfaces"
+	"github.com/irahardianto/service-pattern-go/models"
 )
 
 type PlayerService struct {

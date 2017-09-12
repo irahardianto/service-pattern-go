@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"net/http/httptest"
-	"service-pattern-go/interfaces/mocks"
-	"service-pattern-go/models"
-	"service-pattern-go/viewmodels"
+
+	"github.com/irahardianto/service-pattern-go/interfaces/mocks"
+	"github.com/irahardianto/service-pattern-go/models"
+	"github.com/irahardianto/service-pattern-go/viewmodels"
 
 	"testing"
 

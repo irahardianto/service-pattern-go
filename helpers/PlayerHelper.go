@@ -1,8 +1,8 @@
 package helpers
 
 import (
-	"service-pattern-go/models"
-	"service-pattern-go/viewmodels"
+	"github.com/irahardianto/service-pattern-go/models"
+	"github.com/irahardianto/service-pattern-go/viewmodels"
 )
 
 type PlayerHelper struct{}

@@ -2,9 +2,10 @@ package repositories
 
 import (
 	"encoding/json"
-	"service-pattern-go/helpers"
-	"service-pattern-go/infrastructures"
-	"service-pattern-go/models"
+
+	"github.com/irahardianto/service-pattern-go/helpers"
+	"github.com/irahardianto/service-pattern-go/infrastructures"
+	"github.com/irahardianto/service-pattern-go/models"
 
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )

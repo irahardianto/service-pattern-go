@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"service-pattern-go/helpers"
-	"service-pattern-go/interfaces"
 	"strconv"
+
+	"github.com/irahardianto/service-pattern-go/helpers"
+	"github.com/irahardianto/service-pattern-go/interfaces"
 
 	"github.com/go-chi/chi"
 )

@@ -1,11 +1,12 @@
 package main
 
 import (
-	"service-pattern-go/controllers"
-	"service-pattern-go/infrastructures"
-	"service-pattern-go/repositories"
-	"service-pattern-go/services"
 	"sync"
+
+	"github.com/irahardianto/service-pattern-go/controllers"
+	"github.com/irahardianto/service-pattern-go/infrastructures"
+	"github.com/irahardianto/service-pattern-go/repositories"
+	"github.com/irahardianto/service-pattern-go/services"
 )
 
 type IServiceContainer interface {
