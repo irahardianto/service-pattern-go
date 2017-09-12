@@ -52,7 +52,7 @@ Test first for your liking
 
 Run the app
 
-    go get github.com/mattn/go-sqlite3
+    go build && ./service-pattern-go
 
 And visit
 
