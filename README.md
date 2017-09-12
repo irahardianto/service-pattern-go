@@ -79,64 +79,64 @@ Every implementation should only be by using interface, there should be no direc
  - PlayerController -> implement IPlayerService,  instead of direct PlayerService
 
 
-    type PlayerController struct {
-     	PlayerService interfaces.IPlayerService
-     	PlayerHelper  helpers.PlayerHelper
-    }
+	    type PlayerController struct {
+	     	PlayerService interfaces.IPlayerService
+	     	PlayerHelper  helpers.PlayerHelper
+	    }
 
-    func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
+		func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
 
-     	player1Name := chi.URLParam(req, "player1")
-     	player2Name := chi.URLParam(req, "player2")
+	     	player1Name := chi.URLParam(req, "player1")
+	     	player2Name := chi.URLParam(req, "player2")
 
-     	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
-     	if err != nil {
-     		//Handle error
+	     	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+	     	if err != nil {
+	     		//Handle error
+	     	}
+
+	     	response := controller.PlayerHelper.BuildScoresVM(scores)
+
+	     	json.NewEncoder(res).Encode(response)
      	}
-
-     	response := controller.PlayerHelper.BuildScoresVM(scores)
-
-     	json.NewEncoder(res).Encode(response)
-    }
 
  - PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
-    type PlayerService struct {
-     PlayerRepository interfaces.IPlayerRepository
-    }
+	    type PlayerService struct {
+		    PlayerRepository interfaces.IPlayerRepository
+	    }
 
-    func (service *PlayerService) GetScores(player1Name string, player2Name string) (string, error) {
+	    func (service *PlayerService) GetScores(player1Name string, player2Name string) (string, error) {
 
-    baseScore := [4]string{"Love", "Fifteen", "Thirty", "Forty"}
-    var result string
+	    baseScore := [4]string{"Love", "Fifteen", "Thirty", "Forty"}
+	    var result string
 
-    player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
-    if err != nil {
-      //Handle error
-    }
+	    player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
+	    if err != nil {
+	      //Handle error
+	    }
 
-    player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
-    if err != nil {
-      //Handle error
-    }
+	    player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
+	    if err != nil {
+	      //Handle error
+	    }
 
-    if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
+	    if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
 
-        s := baseScore[player1.Score]
+	        s := baseScore[player1.Score]
 
-        if player1.Score == player2.Score {
-          result = s + "-All"
-        } else {
-          result = s + "-" + baseScore[player2.Score]
-        }
-    }
+	        if player1.Score == player2.Score {
+	          result = s + "-All"
+	        } else {
+	          result = s + "-" + baseScore[player2.Score]
+	        }
+	    }
 
-    if player1.Score == player2.Score {
-      result = "Deuce"
-    }
+	    if player1.Score == player2.Score {
+	      result = "Deuce"
+	    }
 
-    return result, nil
-    }
+	      return result, nil
+	    }
 
 If you look into the implementation of these lines
 
@@ -318,28 +318,28 @@ You see that PlayerController uses IPlayerService interface, and since IPlayerSe
 
 You see, instead of calling directly to PlayerService, PlayerController uses the interface of PlayerService which is IPlayerService, there could be many implementation of IPlayerService not just limited to PlayerService it could be BrotherService etc, but how do we determined that PlayerService will be used instead?
 
-      func (k *kernel) InjectPlayerController() controllers.PlayerController {
+    func (k *kernel) InjectPlayerController() controllers.PlayerController {
 
-        sqlconn := new(infrastructures.SqlConnection)
-        sqlconn.InitDB()
+      sqlconn := new(infrastructures.SqlConnection)
+      sqlconn.InitDB()
 
-        playerRepository := new(repositories.PlayerRepository)
-        playerRepository.Db.Db = sqlconn.GetDB()
+      playerRepository := new(repositories.PlayerRepository)
+      playerRepository.Db.Db = sqlconn.GetDB()
 
-        playerService := new(services.PlayerService)
-        playerService.PlayerRepository = playerRepository
+      playerService := new(services.PlayerService)
+      playerService.PlayerRepository = playerRepository
 
-        playerController := controllers.PlayerController{}
-        playerController.PlayerService = playerService
+      playerController := controllers.PlayerController{}
+      playerController.PlayerService = playerService
 
-        return playerController
-      }
+      return playerController
+    }
 
 This is where dependency injection come in to play, as you see here in servicecontainer.go we are creating **playerController** and then inject it with **playerService** as simple as that, this is what dependency injection all about no more. So **playerController.PlayerService** interface will be injected by **playerService** along with all implementation that it implements, so for example FindById now returns whatever FindById implemented by **playerService** as you can see it in PlayerService.go
 
 Now, how does this relates to TDD & mocking?
 
-        playerService := new(mocks.IPlayerService)
+	playerService := new(mocks.IPlayerService)
 
 You see, in PlayerController_test.go we are using mock object to inject the implementation of our service, lets discuss more detail about mocking and testing in each section.
 
@@ -425,6 +425,8 @@ And assert the result by using testify assertion library
 
 [Circuit Breaker](https://irahardianto.github.io/service-pattern-go/#circuit-breaker)
 -------
+
+Here is the description of circuit breaker
 
 Cheers,
 M. Ichsan Rahardianto.
