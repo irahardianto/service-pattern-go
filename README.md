@@ -79,29 +79,29 @@ Every implementation should only be by using interface, there should be no direc
  - PlayerController -> implement IPlayerService,  instead of direct PlayerService
 
      type PlayerController struct {
-     	PlayerService interfaces.IPlayerService
-     	PlayerHelper  helpers.PlayerHelper
+       	PlayerService interfaces.IPlayerService
+       	PlayerHelper  helpers.PlayerHelper
      }
 
      func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
 
-     	player1Name := chi.URLParam(req, "player1")
-     	player2Name := chi.URLParam(req, "player2")
+       	player1Name := chi.URLParam(req, "player1")
+       	player2Name := chi.URLParam(req, "player2")
 
-     	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
-     	if err != nil {
-     		//Handle error
-     	}
+       	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+       	if err != nil {
+       		//Handle error
+       	}
 
-     	response := controller.PlayerHelper.BuildScoresVM(scores)
+       	response := controller.PlayerHelper.BuildScoresVM(scores)
 
-     	json.NewEncoder(res).Encode(response)
+       	json.NewEncoder(res).Encode(response)
      }
 
  - PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
      type PlayerService struct {
-      PlayerRepository interfaces.IPlayerRepository
+       PlayerRepository interfaces.IPlayerRepository
      }
 
      func (service *PlayerService) GetScores(player1Name string, player2Name string) (string, error) {
@@ -121,13 +121,13 @@ Every implementation should only be by using interface, there should be no direc
 
       if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
 
-        s := baseScore[player1.Score]
+          s := baseScore[player1.Score]
 
-        if player1.Score == player2.Score {
-          result = s + "-All"
-        } else {
-          result = s + "-" + baseScore[player2.Score]
-        }
+          if player1.Score == player2.Score {
+            result = s + "-All"
+          } else {
+            result = s + "-" + baseScore[player2.Score]
+          }
       }
 
       if player1.Score == player2.Score {
@@ -139,10 +139,10 @@ Every implementation should only be by using interface, there should be no direc
 
 If you look into the implementation of these lines
 
-      scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+    scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
 
-      player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
-      player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
+    player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
+    player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
 
 Both are actually abstract implementation of the interface, not the real implementation itself.
 So later on the Dependency Injection section, we will learn those interface will be injected with the implementation during the compile time. This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
@@ -289,50 +289,50 @@ Some other people says that interface is used so your program is decoupled, and 
 The when I learned about mocking, all that I have been asking coming to conclusions as if I was like having epiphany, we will discuss more about mocking in the mocking section, but for now lets discuss it in regards of dependency injection usage. So as you see in our project structure, instead of having all component directly talks to each other, we are using interface, take PlayerController for example
 
     type PlayerController struct {
-     PlayerService interfaces.IPlayerService
-     PlayerHelper  helpers.PlayerHelper
+       PlayerService interfaces.IPlayerService
+       PlayerHelper  helpers.PlayerHelper
     }
 
     func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
 
-     player1Name := chi.URLParam(req, "player1")
-     player2Name := chi.URLParam(req, "player2")
+       player1Name := chi.URLParam(req, "player1")
+       player2Name := chi.URLParam(req, "player2")
 
-     scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
-     if err != nil {
-       //Handle error
-     }
+       scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+       if err != nil {
+         //Handle error
+       }
 
-     response := controller.PlayerHelper.BuildScoresVM(scores)
+       response := controller.PlayerHelper.BuildScoresVM(scores)
 
-     json.NewEncoder(res).Encode(response)
+       json.NewEncoder(res).Encode(response)
     }
 
 You see that PlayerController uses IPlayerService interface, and since IPlayerService has GetScores method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
 
     type IPlayerService interface {
-    	GetScores(player1Name string, player2Name string) (string, error)
-    	GetPlayerMessage() models.MessageModel
+      	GetScores(player1Name string, player2Name string) (string, error)
+      	GetPlayerMessage() models.MessageModel
     }
 
 You see, instead of calling directly to PlayerService, PlayerController uses the interface of PlayerService which is IPlayerService, there could be many implementation of IPlayerService not just limited to PlayerService it could be BrotherService etc, but how do we determined that PlayerService will be used instead?
 
-        func (k *kernel) InjectPlayerController() controllers.PlayerController {
+      func (k *kernel) InjectPlayerController() controllers.PlayerController {
 
-          sqlconn := new(infrastructures.SqlConnection)
-          sqlconn.InitDB()
+        sqlconn := new(infrastructures.SqlConnection)
+        sqlconn.InitDB()
 
-          playerRepository := new(repositories.PlayerRepository)
-          playerRepository.Db.Db = sqlconn.GetDB()
+        playerRepository := new(repositories.PlayerRepository)
+        playerRepository.Db.Db = sqlconn.GetDB()
 
-          playerService := new(services.PlayerService)
-          playerService.PlayerRepository = playerRepository
+        playerService := new(services.PlayerService)
+        playerService.PlayerRepository = playerRepository
 
-          playerController := controllers.PlayerController{}
-          playerController.PlayerService = playerService
+        playerController := controllers.PlayerController{}
+        playerController.PlayerService = playerService
 
-          return playerController
-        }
+        return playerController
+      }
 
 This is where dependency injection come in to play, as you see here in servicecontainer.go we are creating **playerController** and then inject it with **playerService** as simple as that, this is what dependency injection all about no more. So **playerController.PlayerService** interface will be injected by **playerService** along with all implementation that it implements, so for example FindById now returns whatever FindById implemented by **playerService** as you can see it in PlayerService.go
 
