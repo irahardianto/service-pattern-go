@@ -56,7 +56,7 @@ Run the app
 
 And visit
 
-    http://localhost:8080/getPlayer/101
+    http://localhost:8080/getScore/Rafael/vs/Serena
 
 
 ----------

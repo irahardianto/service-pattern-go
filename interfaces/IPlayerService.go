@@ -5,6 +5,6 @@ import (
 )
 
 type IPlayerService interface {
-	FindById(playerId int) models.PlayerModel
+	GetScores(player1Name string, player2Name string) (string, error)
 	GetPlayerMessage() models.MessageModel
 }

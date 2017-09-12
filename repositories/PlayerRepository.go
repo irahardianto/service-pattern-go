@@ -3,6 +3,7 @@ package repositories
 import (
 	"encoding/json"
 
+	"github.com/afex/hystrix-go/hystrix"
 	"github.com/irahardianto/service-pattern-go/helpers"
 	"github.com/irahardianto/service-pattern-go/infrastructures"
 	"github.com/irahardianto/service-pattern-go/models"
@@ -15,41 +16,26 @@ type PlayerRepository struct {
 	SafeAPICall helpers.SafeAPICall
 }
 
-// func InitGormDB(conn *gorm.DB) *GormPlayerRepository {
-//
-// 	dbHandler := new(GormPlayerRepository)
-// 	dbHandler.db = conn
-//
-// 	return dbHandler
-// }
+func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
 
-func (repository *PlayerRepository) GetAllPlayers() []models.PlayerModel {
-	//not implemented yet
-	return nil
-}
-
-func (repository *PlayerRepository) GetPlayerById(id int) models.PlayerModel {
 	conn := repository.Db.GetDB()
-	player := models.PlayerModel{}
-	//conn.db.First(&player, id)
-	conn.First(&player, id)
 
-	return player
-}
+	output := make(chan models.PlayerModel, 1)
+	errors := hystrix.Go("get_player_by_name", func() error {
 
-func (repository *PlayerRepository) CreatePlayer(player models.PlayerModel) (bool, error) {
-	//not implemented yet
-	return false, nil
-}
+		player := models.PlayerModel{}
+		conn.First(&player, "Name = ?", name)
+		output <- player
+		return nil
+	}, nil)
 
-func (repository *PlayerRepository) UpdatePlayer(id int, player models.PlayerModel) (bool, error) {
-	//not implemented yet
-	return false, nil
-}
-
-func (repository *PlayerRepository) DeletePlayer(id int) (bool, error) {
-	//not implemented yet
-	return false, nil
+	select {
+	case out := <-output:
+		return out, nil
+	case err := <-errors:
+		println(err)
+		return models.PlayerModel{}, err
+	}
 }
 
 func (repository *PlayerRepository) GetPlayerMessageFromAPI() models.MessageModel {

@@ -17,7 +17,7 @@ func (router *router) InitRouter() *chi.Mux {
 	playerController := ServiceContainer().InjectPlayerController()
 
 	r := chi.NewRouter()
-	r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+	r.HandleFunc("/getScore/{player1}/vs/{player2}", playerController.GetPlayerScore)
 	r.HandleFunc("/getMessage", playerController.GetPlayerMessage)
 
 	return r

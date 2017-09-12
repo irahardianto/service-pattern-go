@@ -20,7 +20,7 @@ import (
 
 // TestSomething is an example of how to use our test object to
 // make assertions about some target code we are testing.
-func TestGetScore(t *testing.T) {
+func TestPlayerScore(t *testing.T) {
 
 	player := models.PlayerModel{}
 	player.Id = 101
@@ -31,25 +31,24 @@ func TestGetScore(t *testing.T) {
 	playerService := new(mocks.IPlayerService)
 
 	// setup expectations
-	playerService.On("FindById", 101).Return(player)
+	playerService.On("GetScores", "Rafael", "Serena").Return("Forty-Fifteen", nil)
 
 	playerController := PlayerController{}
 	playerController.PlayerService = playerService
 
 	// call the code we are testing
-	req := httptest.NewRequest("GET", "http://localhost:8080/getPlayer/101", nil)
+	req := httptest.NewRequest("GET", "http://localhost:8080/getScore/Rafael/vs/Serena", nil)
 	w := httptest.NewRecorder()
 
 	r := chi.NewRouter()
-	r.HandleFunc("/getPlayer/{id}", playerController.GetPlayer)
+	r.HandleFunc("/getScore/{player1}/vs/{player2}", playerController.GetPlayerScore)
 
 	r.ServeHTTP(w, req)
 
-	expectedResult := viewmodels.PlayerVM{}
-	expectedResult.Name = "Rafael"
-	expectedResult.Score = 3
+	expectedResult := viewmodels.ScoresVM{}
+	expectedResult.Score = "Forty-Fifteen"
 
-	actualResult := viewmodels.PlayerVM{}
+	actualResult := viewmodels.ScoresVM{}
 
 	json.NewDecoder(w.Body).Decode(&actualResult)
 

@@ -3,7 +3,6 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/irahardianto/service-pattern-go/helpers"
 	"github.com/irahardianto/service-pattern-go/interfaces"
@@ -16,13 +15,19 @@ type PlayerController struct {
 	PlayerHelper  helpers.PlayerHelper
 }
 
-func (controller *PlayerController) GetPlayer(res http.ResponseWriter, req *http.Request) {
+func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
 
-	playerId, _ := strconv.Atoi(chi.URLParam(req, "id"))
-	player := controller.PlayerService.FindById(playerId)
-	playerVM := controller.PlayerHelper.BuildPlayerVM(player)
+	player1Name := chi.URLParam(req, "player1")
+	player2Name := chi.URLParam(req, "player2")
 
-	json.NewEncoder(res).Encode(playerVM)
+	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+	if err != nil {
+		//Handle error
+	}
+
+	response := controller.PlayerHelper.BuildScoresVM(scores)
+
+	json.NewEncoder(res).Encode(response)
 }
 
 func (controller *PlayerController) GetPlayerMessage(res http.ResponseWriter, req *http.Request) {
