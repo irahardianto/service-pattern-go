@@ -18,10 +18,11 @@ type PlayerRepository struct {
 
 func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
 
-	conn := repository.Db.GetDB()
-
 	output := make(chan models.PlayerModel, 1)
+	hystrix.ConfigureCommand("get_player_by_name", hystrix.CommandConfig{Timeout: 1000})
 	errors := hystrix.Go("get_player_by_name", func() error {
+
+		conn := repository.Db.GetDB()
 
 		player := models.PlayerModel{}
 		conn.First(&player, "Name = ?", name)

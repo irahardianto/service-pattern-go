@@ -107,33 +107,33 @@ Every implementation should only be by using interface, there should be no direc
 
 	    func (service *PlayerService) GetScores(player1Name string, player2Name string) (string, error) {
 
-	    baseScore := [4]string{"Love", "Fifteen", "Thirty", "Forty"}
-	    var result string
+		    baseScore := [4]string{"Love", "Fifteen", "Thirty", "Forty"}
+		    var result string
 
-	    player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
-	    if err != nil {
-	      //Handle error
-	    }
+		    player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
+		    if err != nil {
+		      //Handle error
+		    }
 
-	    player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
-	    if err != nil {
-	      //Handle error
-	    }
+		    player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
+		    if err != nil {
+		      //Handle error
+		    }
 
-	    if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
+		    if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
 
-	        s := baseScore[player1.Score]
+		        s := baseScore[player1.Score]
 
-	        if player1.Score == player2.Score {
-	          result = s + "-All"
-	        } else {
-	          result = s + "-" + baseScore[player2.Score]
-	        }
-	    }
+		        if player1.Score == player2.Score {
+		          result = s + "-All"
+		        } else {
+		          result = s + "-" + baseScore[player2.Score]
+		        }
+			}
 
-	    if player1.Score == player2.Score {
-	      result = "Deuce"
-	    }
+		    if player1.Score == player2.Score {
+		      result = "Deuce"
+		    }
 
 	      return result, nil
 	    }
@@ -426,7 +426,40 @@ And assert the result by using testify assertion library
 [Circuit Breaker](https://irahardianto.github.io/service-pattern-go/#circuit-breaker)
 -------
 
-Here is the description of circuit breaker
+Building a distributed system we should really think that everything is not reliable, networks could breaks, servers could suddenly crash, even your 100% unit-tested app could be the root cause of the problems.
+
+With that in said, when designing distributed system we should keep that in mind, so when some of our system is down, it won't take the whole system. Circuit breaker is a pattern with which we could design our system to be fault-tolerant and can withstand one or more service failure. It should be wrapping all call outside application ex: db call, redis call, api call.
+
+Essentially circuit breaker works just like electrical circuit breakers, nothing fancy here, the only different is when the breaker is tripped it can be automatically closed when the downstream service is responding properly as described in the picture below.
+
+![circuit breaker](https://drive.google.com/open?id=0ByCnCne9nZuVcXRocWtDcUpoRHM)
+
+In our case, we will be using hystrix-go, it is a go port from Netflix's hystrix library, how it works is essentially the same, even hystrix-go supports turbine along with its hystrix dashboard, but in my case, I rather use the datadog plugins, since we are using datadog to monitor our system.
+
+	func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
+
+		output := make(chan models.PlayerModel, 1)
+		hystrix.ConfigureCommand("get_player_by_name", hystrix.CommandConfig{Timeout: 1000})
+		errors := hystrix.Go("get_player_by_name", func() error {
+
+			conn := repository.Db.GetDB()
+
+			player := models.PlayerModel{}
+			conn.First(&player, "Name = ?", name)
+			output <- player
+			return nil
+		}, nil)
+
+		select {
+		case out := <-output:
+			return out, nil
+		case err := <-errors:
+			println(err)
+			return models.PlayerModel{}, err
+		}
+	}
+As you see here, it is very easy to implement hystrix-go circuit breaker, you just need to wrap your db call inside hystrix if the timeout reached, the circuit breaker will be tripped and all calls to database will be halt, error will be returned instead for future call until db service is up and healthy.
+
 
 Cheers,
 M. Ichsan Rahardianto.
