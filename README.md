@@ -432,7 +432,7 @@ With that in said, when designing distributed system we should keep that in mind
 
 Essentially circuit breaker works just like electrical circuit breakers, nothing fancy here, the only different is when the breaker is tripped it can be automatically closed when the downstream service is responding properly as described in the picture below.
 
-![circuit breaker](https://drive.google.com/open?id=0ByCnCne9nZuVcXRocWtDcUpoRHM)
+![circuit breaker](https://cdn.pbrd.co/images/GKpFVb1.png)
 
 In our case, we will be using hystrix-go, it is a go port from Netflix's hystrix library, how it works is essentially the same, even hystrix-go supports turbine along with its hystrix dashboard, but in my case, I rather use the datadog plugins, since we are using datadog to monitor our system.
 
