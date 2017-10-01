@@ -5,7 +5,7 @@ COPY . ./
 RUN $GOPATH/bin/dep ensure
 RUN go build --tags service-pattern-go --ldflags '-extldflags "-lm -lstdc++ -static"'
 
-FROM scratch
+FROM alpine:latest
 WORKDIR /root/
 COPY --from=builder /go/src/github.com/irahardianto/service-pattern-go/service-pattern-go .
 CMD ["./service-pattern-go"]
