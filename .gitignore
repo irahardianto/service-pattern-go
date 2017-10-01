@@ -14,3 +14,4 @@
 .glide/
 
 ./service-pattern-go
+vendor/
