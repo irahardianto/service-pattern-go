@@ -1,7 +1,7 @@
 service-pattern-go
 -------
 
-Hey! Welcome, this is an example of simple REST API implementation with clean architecture written in Go Lang with complete Dependency Injection along with Mocking example.
+Hey! Welcome, this is an example of simple REST API implementation with clean architecture written in Go Lang with complete Dependency Injection along with Mocking example, following SOLID principles.
 
 Inspired by [Manuel Kiessling go-cleanarchitecture](http://manuel.kiessling.net/2012/09/28/applying-the-clean-architecture-to-go-applications/) and [Joshua Partogi TDD training session](https://github.com/jpartogi/tennis-kata-laravel/)
 
@@ -436,10 +436,9 @@ Essentially circuit breaker works just like electrical circuit breakers, nothing
 
 In our case, we will be using hystrix-go, it is a go port from Netflix's hystrix library, how it works is essentially the same, even hystrix-go supports turbine along with its hystrix dashboard, but in my case, I rather use the datadog plugins, since we are using datadog to monitor our system.
 
-For the sake of SOLID principle implementation in our codebase, we will add hystrix-go to our PlayerRepository leveraging decorator pattern, this will maintain our base repository implementation, the one that calls database, clean from modification and we will create its extension which is named PlayerRepositoryWithCircuitBreaker. If you recall we inject our service with PlayerRepositoryWithCircuitBreaker rather than the original PlayerRepository.
+For the sake of SOLID principles implementation in our codebase, we will add hystrix-go to our PlayerRepository leveraging decorator pattern, this will maintain our base repository implementation, the one that calls database, clean from modification and we will create its extension which is named PlayerRepositoryWithCircuitBreaker. If you recall we inject our PlayerService with PlayerRepositoryWithCircuitBreaker and the original PlayerRepository wrapped inside.
 
 	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
-
 
 
 Base PlayerRepository implementation :
