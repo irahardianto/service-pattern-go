@@ -438,26 +438,27 @@ In our case, we will be using hystrix-go, it is a go port from Netflix's hystrix
 
 For the sake of SOLID principle implementation in our codebase, we will add hystrix-go to our PlayerRepository leveraging decorator pattern, this will maintain our base repository implementation, the one that calls database, clean from modification and we will create its extension which is named PlayerRepositoryWithCircuitBreaker. If you recall we inject our service with PlayerRepositoryWithCircuitBreaker rather than the original PlayerRepository.
 
-  playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
+	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
 
 
-Base PlayerRepository implementation
 
-  type PlayerRepository struct {
-  	Db infrastructures.SqlConnection
-  }
+Base PlayerRepository implementation :
 
-  func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
+	type PlayerRepository struct {
+	  	Db infrastructures.SqlConnection
+	}
 
-  	conn := repository.Db.GetDB()
+    func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
 
-  	player := models.PlayerModel{}
-  	conn.First(&player, "Name = ?", name)
+	  	conn := repository.Db.GetDB()
 
-  	return player, nil
-  }
+	  	player := models.PlayerModel{}
+	  	conn.First(&player, "Name = ?", name)
 
-PlayerRepository extension implementation
+	  	return player, nil
+	}
+
+PlayerRepository extension implementation :
 
     type PlayerRepositoryWithCircuitBreaker struct {
     	PlayerRepository interfaces.IPlayerRepository
@@ -483,6 +484,7 @@ PlayerRepository extension implementation
     		return models.PlayerModel{}, err
     	}
     }
+
 As you see here, it is very easy to implement hystrix-go circuit breaker, you just need to wrap your db call inside hystrix if the timeout reached, the circuit breaker will be tripped and all calls to database will be halt, error will be returned instead for future call until db service is up and healthy.
 
 
