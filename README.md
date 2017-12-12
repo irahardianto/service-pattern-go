@@ -313,7 +313,6 @@ You see that PlayerController uses IPlayerService interface, and since IPlayerSe
 
     type IPlayerService interface {
       GetScores(player1Name string, player2Name string) (string, error)
-      GetPlayerMessage() models.MessageModel
     }
 
 You see, instead of calling directly to PlayerService, PlayerController uses the interface of PlayerService which is IPlayerService, there could be many implementation of IPlayerService not just limited to PlayerService it could be BrotherService etc, but how do we determined that PlayerService will be used instead?
