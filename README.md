@@ -44,7 +44,7 @@ Setup dependencies
 
 Setup sqlite data structure
 
-    sqlite3 /var/tmp/gorm.db < setup.sql
+    sqlite3 /var/tmp/tennis.db < setup.sql
 
 Test first for your liking
 

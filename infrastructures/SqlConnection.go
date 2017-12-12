@@ -24,7 +24,7 @@ func (sql *SqlConnection) InitDB() error {
 	var err error
 
 	// open a db connection //
-	sql.Db, err = gorm.Open("sqlite3", "/var/tmp/gorm.db")
+	sql.Db, err = gorm.Open("sqlite3", "/var/tmp/tennis.db")
 	if err != nil {
 		fmt.Println("Failed to connect database : ", err.Error())
 	}
