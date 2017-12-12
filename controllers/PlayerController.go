@@ -29,9 +29,3 @@ func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req 
 
 	json.NewEncoder(res).Encode(response)
 }
-
-func (controller *PlayerController) GetPlayerMessage(res http.ResponseWriter, req *http.Request) {
-
-	data := controller.PlayerService.GetPlayerMessage()
-	json.NewEncoder(res).Encode(data)
-}

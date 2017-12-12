@@ -18,7 +18,6 @@ func (router *router) InitRouter() *chi.Mux {
 
 	r := chi.NewRouter()
 	r.HandleFunc("/getScore/{player1}/vs/{player2}", playerController.GetPlayerScore)
-	r.HandleFunc("/getMessage", playerController.GetPlayerMessage)
 
 	return r
 }

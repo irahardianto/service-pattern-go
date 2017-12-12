@@ -17,14 +17,14 @@ type kernel struct{}
 
 func (k *kernel) InjectPlayerController() controllers.PlayerController {
 
-	sqlconn := new(infrastructures.SqlConnection)
+	sqlconn := &infrastructures.SqlConnection{}
 	sqlconn.InitDB()
 
-	playerRepository := new(repositories.PlayerRepository)
+	playerRepository := &repositories.PlayerRepository{}
 	playerRepository.Db.Db = sqlconn.GetDB()
 
-	playerService := new(services.PlayerService)
-	playerService.PlayerRepository = playerRepository
+	playerService := &services.PlayerService{}
+	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
 
 	playerController := controllers.PlayerController{}
 	playerController.PlayerService = playerService

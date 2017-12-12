@@ -2,7 +2,6 @@ package services
 
 import (
 	"github.com/irahardianto/service-pattern-go/interfaces"
-	"github.com/irahardianto/service-pattern-go/models"
 )
 
 type PlayerService struct {
@@ -40,11 +39,4 @@ func (service *PlayerService) GetScores(player1Name string, player2Name string) 
 	}
 
 	return result, nil
-}
-
-func (service *PlayerService) GetPlayerMessage() models.MessageModel {
-
-	data := service.PlayerRepository.GetPlayerMessageFromAPI()
-
-	return data
 }

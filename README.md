@@ -323,11 +323,11 @@ You see, instead of calling directly to PlayerService, PlayerController uses the
       sqlconn := new(infrastructures.SqlConnection)
       sqlconn.InitDB()
 
-      playerRepository := new(repositories.PlayerRepository)
+      playerRepository := &repositories.PlayerRepository{}
       playerRepository.Db.Db = sqlconn.GetDB()
 
-      playerService := new(services.PlayerService)
-      playerService.PlayerRepository = playerRepository
+      playerService := &services.PlayerService{}
+      playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
 
       playerController := controllers.PlayerController{}
       playerController.PlayerService = playerService
@@ -436,28 +436,53 @@ Essentially circuit breaker works just like electrical circuit breakers, nothing
 
 In our case, we will be using hystrix-go, it is a go port from Netflix's hystrix library, how it works is essentially the same, even hystrix-go supports turbine along with its hystrix dashboard, but in my case, I rather use the datadog plugins, since we are using datadog to monitor our system.
 
-	func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
+For the sake of SOLID principle implementation in our codebase, we will add hystrix-go to our PlayerRepository leveraging decorator pattern, this will maintain our base repository implementation, the one that calls database, clean from modification and we will create its extension which is named PlayerRepositoryWithCircuitBreaker. If you recall we inject our service with PlayerRepositoryWithCircuitBreaker rather than the original PlayerRepository.
 
-		output := make(chan models.PlayerModel, 1)
-		hystrix.ConfigureCommand("get_player_by_name", hystrix.CommandConfig{Timeout: 1000})
-		errors := hystrix.Go("get_player_by_name", func() error {
+  playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
 
-			conn := repository.Db.GetDB()
 
-			player := models.PlayerModel{}
-			conn.First(&player, "Name = ?", name)
-			output <- player
-			return nil
-		}, nil)
+Base PlayerRepository implementation
 
-		select {
-		case out := <-output:
-			return out, nil
-		case err := <-errors:
-			println(err)
-			return models.PlayerModel{}, err
-		}
-	}
+  type PlayerRepository struct {
+  	Db infrastructures.SqlConnection
+  }
+
+  func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
+
+  	conn := repository.Db.GetDB()
+
+  	player := models.PlayerModel{}
+  	conn.First(&player, "Name = ?", name)
+
+  	return player, nil
+  }
+
+PlayerRepository extension implementation
+
+    type PlayerRepositoryWithCircuitBreaker struct {
+    	PlayerRepository interfaces.IPlayerRepository
+    }
+
+    func (repository *PlayerRepositoryWithCircuitBreaker) GetPlayerByName(name string) (models.PlayerModel, error) {
+
+    	output := make(chan models.PlayerModel, 1)
+    	hystrix.ConfigureCommand("get_player_by_name", hystrix.CommandConfig{Timeout: 1000})
+    	errors := hystrix.Go("get_player_by_name", func() error {
+
+    		player, _ := repository.PlayerRepository.GetPlayerByName(name)
+
+    		output <- player
+    		return nil
+    	}, nil)
+
+    	select {
+    	case out := <-output:
+    		return out, nil
+    	case err := <-errors:
+    		println(err)
+    		return models.PlayerModel{}, err
+    	}
+    }
 As you see here, it is very easy to implement hystrix-go circuit breaker, you just need to wrap your db call inside hystrix if the timeout reached, the circuit breaker will be tripped and all calls to database will be halt, error will be returned instead for future call until db service is up and healthy.
 
 

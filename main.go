@@ -4,10 +4,6 @@ import (
 	"net/http"
 )
 
-func init() {
-
-}
-
 func main() {
 
 	r := ChiRouter().InitRouter()

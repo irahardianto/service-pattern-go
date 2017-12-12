@@ -29,17 +29,3 @@ func (_m *IPlayerRepository) GetPlayerByName(name string) (models.PlayerModel, e
 
 	return r0, r1
 }
-
-// GetPlayerMessageFromAPI provides a mock function with given fields:
-func (_m *IPlayerRepository) GetPlayerMessageFromAPI() models.MessageModel {
-	ret := _m.Called()
-
-	var r0 models.MessageModel
-	if rf, ok := ret.Get(0).(func() models.MessageModel); ok {
-		r0 = rf()
-	} else {
-		r0 = ret.Get(0).(models.MessageModel)
-	}
-
-	return r0
-}
