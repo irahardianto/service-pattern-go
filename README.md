@@ -435,7 +435,10 @@ Essentially circuit breaker works just like electrical circuit breakers, nothing
 
 In our case, we will be using hystrix-go, it is a go port from Netflix's hystrix library, how it works is essentially the same, even hystrix-go supports turbine along with its hystrix dashboard, but in my case, I rather use the datadog plugins, since we are using datadog to monitor our system.
 
-For the sake of SOLID principles implementation in our codebase, we will add hystrix-go to our PlayerRepository leveraging decorator pattern, this will maintain our base repository implementation, the one that calls database, clean from modification and we will create its extension which is named PlayerRepositoryWithCircuitBreaker. If you recall we inject our PlayerService with PlayerRepositoryWithCircuitBreaker and the original PlayerRepository wrapped inside.
+For the sake of SOLID principles implementation in our codebase, we will add hystrix-go to our PlayerRepository leveraging decorator pattern, this will maintain our base repository implementation, the one that calls database, clean from modification and we will create its extension which is named PlayerRepositoryWithCircuitBreaker. This is the O part of SOLID which stands for Open for extension, Close for modification.
+
+
+If you recall we inject our PlayerService with PlayerRepositoryWithCircuitBreaker and the original PlayerRepository wrapped inside.
 
 	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
 
@@ -482,6 +485,13 @@ PlayerRepository extension implementation :
     		return models.PlayerModel{}, err
     	}
     }
+
+Basically PlayerRepositoryWithCircuitBreaker implement the same interface as PlayerRepository, IPlayerRepository
+
+  type IPlayerRepository interface {
+  	GetPlayerByName(name string) (models.PlayerModel, error)
+  }
+
 
 As you see here, it is very easy to implement hystrix-go circuit breaker, you just need to wrap your db call inside hystrix if the timeout reached, the circuit breaker will be tripped and all calls to database will be halt, error will be returned instead for future call until db service is up and healthy.
 
