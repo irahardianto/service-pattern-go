@@ -79,8 +79,8 @@ PlayerController -> implement IPlayerService,  instead of direct PlayerService
 
 
     type PlayerController struct {
-     	PlayerService interfaces.IPlayerService
-     	PlayerHelper  helpers.PlayerHelper
+      PlayerService interfaces.IPlayerService
+      PlayerHelper  helpers.PlayerHelper
     }
 
     func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
@@ -120,15 +120,15 @@ PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
         //Handle error
       }
 
-    if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
+      if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
 
        s := baseScore[player1.Score]
 
-       if player1.Score == player2.Score {
-         result = s + "-All"
-       } else {
-         result = s + "-" + baseScore[player2.Score]
-       }
+         if player1.Score == player2.Score {
+           result = s + "-All"
+         } else {
+           result = s + "-" + baseScore[player2.Score]
+         }
       }
 
       if player1.Score == player2.Score {
