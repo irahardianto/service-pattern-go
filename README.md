@@ -122,13 +122,13 @@ PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
       if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
 
-       s := baseScore[player1.Score]
+        s := baseScore[player1.Score]
 
-         if player1.Score == player2.Score {
-           result = s + "-All"
-         } else {
+        if player1.Score == player2.Score {
+          result = s + "-All"
+        } else {
            result = s + "-" + baseScore[player2.Score]
-         }
+        }
       }
 
       if player1.Score == player2.Score {
@@ -323,7 +323,7 @@ You see, instead of calling directly to PlayerService, PlayerController uses the
       sqliteHandler := &infrastructures.SQLiteHandler{}
       sqliteHandler.Conn = sqlConn
 
-      playerRepository := &repositories.PlayerRepository{*sqliteHandler}
+      playerRepository := &repositories.PlayerRepository{sqliteHandler}
 
       playerService := &services.PlayerService{}
       playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
@@ -446,7 +446,7 @@ If you recall we inject our PlayerService with PlayerRepositoryWithCircuitBreake
 Base PlayerRepository implementation :
 
 	type PlayerRepository struct {
-      infrastructures.SQLiteHandler
+      interfaces.IDbHandler
 	}
 
     func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
@@ -467,7 +467,7 @@ Base PlayerRepository implementation :
 PlayerRepository extension implementation :
 
     type PlayerRepositoryWithCircuitBreaker struct {
-    	PlayerRepository interfaces.IPlayerRepository
+      PlayerRepository interfaces.IPlayerRepository
     }
 
     func (repository *PlayerRepositoryWithCircuitBreaker) GetPlayerByName(name string) (models.PlayerModel, error) {
