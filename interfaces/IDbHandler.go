@@ -1,11 +1,11 @@
 package interfaces
 
-type DbHandler interface {
+type IDbHandler interface {
 	Execute(statement string)
-	Query(statement string) (Row, error)
+	Query(statement string) (IRow, error)
 }
 
-type Row interface {
+type IRow interface {
 	Scan(dest ...interface{}) error
 	Next() bool
 }

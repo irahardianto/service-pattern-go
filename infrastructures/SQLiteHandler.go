@@ -14,7 +14,7 @@ func (handler *SQLiteHandler) Execute(statement string) {
 	handler.Conn.Exec(statement)
 }
 
-func (handler *SQLiteHandler) Query(statement string) (interfaces.Row, error) {
+func (handler *SQLiteHandler) Query(statement string) (interfaces.IRow, error) {
 	//fmt.Println(statement)
 	rows, err := handler.Conn.Query(statement)
 

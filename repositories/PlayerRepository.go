@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"github.com/afex/hystrix-go/hystrix"
-	"github.com/irahardianto/service-pattern-go/infrastructures"
 	"github.com/irahardianto/service-pattern-go/interfaces"
 	"github.com/irahardianto/service-pattern-go/models"
 
@@ -36,7 +35,7 @@ func (repository *PlayerRepositoryWithCircuitBreaker) GetPlayerByName(name strin
 }
 
 type PlayerRepository struct {
-	infrastructures.SQLiteHandler
+	interfaces.IDbHandler
 }
 
 func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {

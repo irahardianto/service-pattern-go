@@ -22,7 +22,7 @@ func (k *kernel) InjectPlayerController() controllers.PlayerController {
 	sqliteHandler := &infrastructures.SQLiteHandler{}
 	sqliteHandler.Conn = sqlConn
 
-	playerRepository := &repositories.PlayerRepository{*sqliteHandler}
+	playerRepository := &repositories.PlayerRepository{sqliteHandler}
 
 	playerService := &services.PlayerService{}
 	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
