@@ -7,6 +7,7 @@ import (
 	"github.com/irahardianto/service-pattern-go/models"
 
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"fmt"
 )
 
 type PlayerRepositoryWithCircuitBreaker struct {
@@ -35,15 +36,20 @@ func (repository *PlayerRepositoryWithCircuitBreaker) GetPlayerByName(name strin
 }
 
 type PlayerRepository struct {
-	Db infrastructures.SqlConnection
+	infrastructures.SQLiteHandler
 }
 
 func (repository *PlayerRepository) GetPlayerByName(name string) (models.PlayerModel, error) {
 
-	conn := repository.Db.GetDB()
+	row, err :=repository.Query(fmt.Sprintf("SELECT * FROM player_models WHERE name = '%s'", name))
+	if err != nil {
+		return models.PlayerModel{}, err
+	}
 
-	player := models.PlayerModel{}
-	conn.First(&player, "Name = ?", name)
+	var player models.PlayerModel
+
+	row.Next()
+	row.Scan(&player.Id, &player.Name, &player.Score)
 
 	return player, nil
 }

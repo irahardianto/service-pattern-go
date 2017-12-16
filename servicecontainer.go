@@ -4,9 +4,10 @@ import (
 	"sync"
 
 	"github.com/irahardianto/service-pattern-go/controllers"
-	"github.com/irahardianto/service-pattern-go/infrastructures"
 	"github.com/irahardianto/service-pattern-go/repositories"
+	"github.com/irahardianto/service-pattern-go/infrastructures"
 	"github.com/irahardianto/service-pattern-go/services"
+	"database/sql"
 )
 
 type IServiceContainer interface {
@@ -17,11 +18,11 @@ type kernel struct{}
 
 func (k *kernel) InjectPlayerController() controllers.PlayerController {
 
-	sqlconn := &infrastructures.SqlConnection{}
-	sqlconn.InitDB()
+	sqlConn, _ := sql.Open("sqlite3", "/var/tmp/tennis.db")
+	sqliteHandler := &infrastructures.SQLiteHandler{}
+	sqliteHandler.Conn = sqlConn
 
-	playerRepository := &repositories.PlayerRepository{}
-	playerRepository.Db.Db = sqlconn.GetDB()
+	playerRepository := &repositories.PlayerRepository{*sqliteHandler}
 
 	playerService := &services.PlayerService{}
 	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
