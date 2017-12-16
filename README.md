@@ -75,30 +75,30 @@ The aim of the architecture is to produce a system that are:
 
 Every implementation should only be by using interface, there should be no direct access from the implementor to implementation, that way we can inject its dependency and replace it with mock object during unit tests. For example:
 
- - PlayerController -> implement IPlayerService,  instead of direct PlayerService
+PlayerController -> implement IPlayerService,  instead of direct PlayerService
 
 
-	    type PlayerController struct {
-	     	PlayerService interfaces.IPlayerService
-	     	PlayerHelper  helpers.PlayerHelper
-	    }
+    type PlayerController struct {
+     	PlayerService interfaces.IPlayerService
+     	PlayerHelper  helpers.PlayerHelper
+    }
 
-		func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
+    func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
 
-	     	player1Name := chi.URLParam(req, "player1")
-	     	player2Name := chi.URLParam(req, "player2")
+      player1Name := chi.URLParam(req, "player1")
+      player2Name := chi.URLParam(req, "player2")
 
-	     	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
-	     	if err != nil {
-	     		//Handle error
-	     	}
+      scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+      if err != nil {
+          //Handle error       
+      }
+             
+      response := controller.PlayerHelper.BuildScoresVM(scores)
 
-	     	response := controller.PlayerHelper.BuildScoresVM(scores)
+      json.NewEncoder(res).Encode(response)
+    }
 
-	     	json.NewEncoder(res).Encode(response)
-     	}
-
- - PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
+PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
 
     type PlayerService struct {
@@ -120,15 +120,15 @@ Every implementation should only be by using interface, there should be no direc
         //Handle error
       }
 
-      if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
+    if player1.Score < 4 && player2.Score < 4 && !(player1.Score+player2.Score == 6) {
 
-        s := baseScore[player1.Score]
+       s := baseScore[player1.Score]
 
-        if player1.Score == player2.Score {
-          result = s + "-All"
-        } else {
-          result = s + "-" + baseScore[player2.Score]
-        }
+       if player1.Score == player2.Score {
+         result = s + "-All"
+       } else {
+         result = s + "-" + baseScore[player2.Score]
+       }
       }
 
       if player1.Score == player2.Score {
