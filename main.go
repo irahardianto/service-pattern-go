@@ -6,7 +6,7 @@ import (
 
 func main() {
 
-	r := ChiRouter().InitRouter()
-
-	http.ListenAndServe(":8080", r)
+	http.ListenAndServe(":8080", ChiRouter().InitRouter())
 }
+
+
