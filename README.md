@@ -17,7 +17,6 @@ Get Started:
  - [Install](https://irahardianto.github.io/service-pattern-go/#install)
  - [Introduction](https://irahardianto.github.io/service-pattern-go/#introduction)
  - [Folder Structure](https://irahardianto.github.io/service-pattern-go/#folder-structure)
- - [Naming Convention](https://irahardianto.github.io/service-pattern-go/#naming-convention)
  - [Depency Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
  - [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
  - [Testing](https://irahardianto.github.io/service-pattern-go/#testing)
@@ -79,30 +78,30 @@ PlayerController -> implement IPlayerService,  instead of direct PlayerService
 
 
     type PlayerController struct {
-      PlayerService interfaces.IPlayerService
-      PlayerHelper  helpers.PlayerHelper
+        interfaces.IPlayerService
+        PlayerHelper  helpers.PlayerHelper
     }
-
+    
     func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
-
-      player1Name := chi.URLParam(req, "player1")
-      player2Name := chi.URLParam(req, "player2")
-
-      scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
-      if err != nil {
-          //Handle error       
-      }
-             
-      response := controller.PlayerHelper.BuildScoresVM(scores)
-
-      json.NewEncoder(res).Encode(response)
+    
+        player1Name := chi.URLParam(req, "player1")
+        player2Name := chi.URLParam(req, "player2")
+    
+        scores, err := controller.GetScores(player1Name, player2Name)
+        if err != nil {
+            //Handle error
+        }
+    
+        response := controller.PlayerHelper.BuildScoresVM(scores)
+    
+        json.NewEncoder(res).Encode(response)
     }
 
 PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
 
     type PlayerService struct {
-      PlayerRepository interfaces.IPlayerRepository
+      interfaces.IPlayerRepository
     }
 
     func (service *PlayerService) GetScores(player1Name string, player2Name string) (string, error) {
@@ -110,12 +109,12 @@ PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
       baseScore := [4]string{"Love", "Fifteen", "Thirty", "Forty"}
       var result string
 
-      player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
+      player1, err := service.GetPlayerByName(player1Name)
       if err != nil {
         //Handle error
       }
 
-      player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
+      player2, err := service.GetPlayerByName(player2Name)
       if err != nil {
         //Handle error
       }
@@ -138,12 +137,14 @@ PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
       return result, nil
     }
     
-If you look into the implementation of these lines
+If you look into the implementation of this line in PlayerController
 
-    scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+    scores, err := controller.GetScores(player1Name, player2Name)
 
-    player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
-    player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
+And these lines in PlayerService
+
+    player1, err := service.GetPlayerByName(player1Name)
+    player2, err := service.GetPlayerByName(player2Name)
 
 Both are actually abstract implementation of the interface, not the real implementation itself.
 So later on the Dependency Injection section, we will learn those interface will be injected with the implementation during the compile time. This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
@@ -172,14 +173,6 @@ Router that is used should only the one that **net/http** compatible, that way w
 The folder structure is created to accomodate seperation of concern principle, where every struct should have single responsibility to achieve decoupled system.
 
 Every folder is a namespace of their own, and every file / struct under the same folder should only use the same namepace as their root folder.
-
-### commands
-
-commands folder hosts all the structs under commands namespace, commands are intended to run console app that don't need interaction like crons and daemon alike.
-
-### configurations
-
-configurations folder hosts all the structs under configurations namespace, the folder should hold configurations of the systems, the environment variables, etc.
 
 ### controllers
 
@@ -237,43 +230,6 @@ router.go is where we binds controllers to appropriate route to handle desired h
 
 servicecontainer.go is where the magic begins, this is the place where we injected all implementations of interfaces. Lets cover throughly in the dependency injection section.
 
-
-----------
-
-[Naming Convention](https://irahardianto.github.io/service-pattern-go/#naming-convention)
--------
-- Folders & Namespaces
-
-  Folder naming must be :
-  1. Descriptive
-  2. Prefer short than long word
-
-- Files
-
-  Files naming must be :
-  1. Use mixedCaps with first uppercase, eg : DateTime.go, not dateTime.go, String.go not string.go
-  2. Interface function file name must be follow by "I" character, match with interface function declaration eg : IConnection, IRewardsService
-  3. Descriptive, file name must be describe what it's functions.  
-  4. Follow SRP (Single Responsibility Priciple), File name is the first time to look before reach the code inside, don't mixed String with DateTime.
-
-- Struct
-
-  There are two kind of struct in declaration, first declaring data model and last one wiring things.
-
-- Interface
-
-  Interface name must be start with "I" character, for example "IConnection", "IRewardService".  
-
-- Variable declaration
-
-  Variable names should be short rather than long. This is especially true for local variables with limited scope. Prefer c to lineCount. Prefer i to sliceIndex. For other variable use mixedCaps (eg : GlobalVariable, privateVariable)
-
-- Functions
-
-  Function names must be as descriptive as possible, don't use long word if not necessary. Same as declaring variable, function name must be use mixedCaps
-
-- Main modules
-
 ----------
 
 [Dependecy Injection](https://irahardianto.github.io/service-pattern-go/#dependency-injection)
@@ -290,23 +246,23 @@ Some other people says that interface is used so your program is decoupled, and 
 The when I learned about mocking, all that I have been asking coming to conclusions as if I was like having epiphany, we will discuss more about mocking in the mocking section, but for now lets discuss it in regards of dependency injection usage. So as you see in our project structure, instead of having all component directly talks to each other, we are using interface, take PlayerController for example
 
     type PlayerController struct {
-       PlayerService interfaces.IPlayerService
-       PlayerHelper  helpers.PlayerHelper
+      interfaces.IPlayerService
+      PlayerHelper  helpers.PlayerHelper
     }
-
+    
     func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
-
-       player1Name := chi.URLParam(req, "player1")
-       player2Name := chi.URLParam(req, "player2")
-
-       scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
-       if err != nil {
-         //Handle error
-       }
-
-       response := controller.PlayerHelper.BuildScoresVM(scores)
-
-       json.NewEncoder(res).Encode(response)
+    
+      player1Name := chi.URLParam(req, "player1")
+      player2Name := chi.URLParam(req, "player2")
+    
+      scores, err := controller.GetScores(player1Name, player2Name)
+      if err != nil {
+        //Handle error
+      }
+    
+      response := controller.PlayerHelper.BuildScoresVM(scores)
+    
+      json.NewEncoder(res).Encode(response)
     }
 
 You see that PlayerController uses IPlayerService interface, and since IPlayerService has GetScores method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
@@ -323,18 +279,14 @@ You see, instead of calling directly to PlayerService, PlayerController uses the
       sqliteHandler := &infrastructures.SQLiteHandler{}
       sqliteHandler.Conn = sqlConn
 
-      playerRepository := &repositories.PlayerRepository{sqliteHandler}
-
-      playerService := &services.PlayerService{}
-      playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
-
-      playerController := controllers.PlayerController{}
-      playerController.PlayerService = playerService
+	  playerRepository := &repositories.PlayerRepository{sqliteHandler}
+	  playerService := &services.PlayerService{&repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}}
+	  playerController := controllers.PlayerController{playerService,helpers.PlayerHelper{}}
 
       return playerController
     }
 
-This is where dependency injection come in to play, as you see here in servicecontainer.go we are creating **playerController** and then inject it with **playerService** as simple as that, this is what dependency injection all about no more. So **playerController.PlayerService** interface will be injected by **playerService** along with all implementation that it implements, so for example FindById now returns whatever FindById implemented by **playerService** as you can see it in PlayerService.go
+This is where dependency injection come in to play, as you see here in servicecontainer.go we are creating **playerController** and inject it with **playerService** as simple as that, this is what dependency injection all about no more. So **playerController's IPlayerService** will be injected by **playerService** along with all implementation that it implements, so for example **GetPlayerByName** now returns whatever **GetPlayerByName** implemented by **playerService** as you can see it in **PlayerService.go**
 
 Now, how does this relates to TDD & mocking?
 
@@ -347,7 +299,7 @@ You see, in PlayerController_test.go we are using mock object to inject the impl
 [Mocking](https://irahardianto.github.io/service-pattern-go/#mocking)
 -------
 
-Mocking is a concept many times people struggle to understand, let alone implement it, at least I am the one among the one struggle to understand this concept. But understanding this concept is essential to do TDD. The key point is, we mock dependencies that we need to run our tests, this is why dependency injection is essential to proceed. We are using testfy as our mock library
+Mocking is a concept many times people struggle to understand, let alone implement it, at least I was the one among the one who struggles to understand this concept. But understanding this concept is essential to do TDD. The key point is, we mock dependencies that we need to run our tests, this is why dependency injection is essential to proceed. We are using testfy as our mock library
 
 Basically what mock object do is replacing injection instead of real implementation with mock as point out at the end of dependency injection session
 
@@ -359,8 +311,7 @@ We then create mock GetScores functionalities along with its request and respons
 
 As you see, then the mock object is injected to **playerService** of PlayerController, this is why dependency injection is essential to this proses as it is the only way we can inject interface with mock object instead of real implementation.
 
-    playerController := PlayerController{}
-    playerController.PlayerService = playerService
+	playerController := PlayerController{playerService, helpers.PlayerHelper{}}
 
 We generate mock our by using vektra mockery for IPlayerService, go to the interfaces folder and then just type.
 
@@ -383,8 +334,7 @@ We have cover pretty much everything there is I hope that you already get the id
       // setup expectations
       playerService.On("GetScores", "Rafael", "Serena").Return("Forty-Fifteen", nil)
 
-      playerController := PlayerController{}
-      playerController.PlayerService = playerService
+	  playerController := PlayerController{playerService, helpers.PlayerHelper{}}
 
       // call the code we are testing
       req := httptest.NewRequest("GET", "http://localhost:8080/getScore/Rafael/vs/Serena", nil)
@@ -493,9 +443,9 @@ PlayerRepository extension implementation :
 
 Basically PlayerRepositoryWithCircuitBreaker implement the same interface as PlayerRepository, IPlayerRepository
 
-  type IPlayerRepository interface {
-  	GetPlayerByName(name string) (models.PlayerModel, error)
-  }
+    type IPlayerRepository interface {
+      GetPlayerByName(name string) (models.PlayerModel, error)
+    }
 
 
 As you see here, it is very easy to implement hystrix-go circuit breaker, you just need to wrap your db call inside hystrix if the timeout reached, the circuit breaker will be tripped and all calls to database will be halt, error will be returned instead for future call until db service is up and healthy.

@@ -8,6 +8,7 @@ import (
 	"github.com/irahardianto/service-pattern-go/infrastructures"
 	"github.com/irahardianto/service-pattern-go/services"
 	"database/sql"
+	"github.com/irahardianto/service-pattern-go/helpers"
 )
 
 type IServiceContainer interface {
@@ -23,12 +24,8 @@ func (k *kernel) InjectPlayerController() controllers.PlayerController {
 	sqliteHandler.Conn = sqlConn
 
 	playerRepository := &repositories.PlayerRepository{sqliteHandler}
-
-	playerService := &services.PlayerService{}
-	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
-
-	playerController := controllers.PlayerController{}
-	playerController.PlayerService = playerService
+	playerService := &services.PlayerService{&repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}}
+	playerController := controllers.PlayerController{playerService,helpers.PlayerHelper{}}
 
 	return playerController
 }

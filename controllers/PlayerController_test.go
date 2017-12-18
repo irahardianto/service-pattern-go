@@ -11,6 +11,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
+	"github.com/irahardianto/service-pattern-go/helpers"
 )
 
 /*
@@ -27,8 +28,7 @@ func TestPlayerScore(t *testing.T) {
 	// setup expectations
 	playerService.On("GetScores", "Rafael", "Serena").Return("Forty-Fifteen", nil)
 
-	playerController := PlayerController{}
-	playerController.PlayerService = playerService
+	playerController := PlayerController{playerService, helpers.PlayerHelper{}}
 
 	// call the code we are testing
 	req := httptest.NewRequest("GET", "http://localhost:8080/getScore/Rafael/vs/Serena", nil)

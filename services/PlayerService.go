@@ -5,7 +5,7 @@ import (
 )
 
 type PlayerService struct {
-	PlayerRepository interfaces.IPlayerRepository
+	interfaces.IPlayerRepository
 }
 
 func (service *PlayerService) GetScores(player1Name string, player2Name string) (string, error) {
@@ -13,12 +13,12 @@ func (service *PlayerService) GetScores(player1Name string, player2Name string) 
 	baseScore := [4]string{"Love", "Fifteen", "Thirty", "Forty"}
 	var result string
 
-	player1, err := service.PlayerRepository.GetPlayerByName(player1Name)
+	player1, err := service.GetPlayerByName(player1Name)
 	if err != nil {
 		//Handle error
 	}
 
-	player2, err := service.PlayerRepository.GetPlayerByName(player2Name)
+	player2, err := service.GetPlayerByName(player2Name)
 	if err != nil {
 		//Handle error
 	}

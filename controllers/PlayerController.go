@@ -11,7 +11,7 @@ import (
 )
 
 type PlayerController struct {
-	PlayerService interfaces.IPlayerService
+	interfaces.IPlayerService
 	PlayerHelper  helpers.PlayerHelper
 }
 
@@ -20,7 +20,7 @@ func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req 
 	player1Name := chi.URLParam(req, "player1")
 	player2Name := chi.URLParam(req, "player2")
 
-	scores, err := controller.PlayerService.GetScores(player1Name, player2Name)
+	scores, err := controller.GetScores(player1Name, player2Name)
 	if err != nil {
 		//Handle error
 	}
