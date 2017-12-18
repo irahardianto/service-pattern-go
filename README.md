@@ -69,7 +69,7 @@ The aim of the architecture is to produce a system that are:
 
  - Independent of frameworks. The system should be able to become an independent system, not bound into any framework implementation that cause the system to be bloated, instead those framework should be used as a tools to support the system implementation rather than limiting the system capabilities.
  - Highly testable. All codes are guilty and tests is the only way we can prove it otherwise, this means that our test coverage has to be able to cover as much layers as we can so we can be sure of our code reliability.
- - Independent of database. Business logic should not be bound to the database, the system should be able to swap Maria DB, Mongo DB, Dynamo DB without breaking the logic.
+ - Independent of database. Business logic should not be bound to the database, the system should be able to swap MySQL, Maria DB, PosgreSQL, Mongo DB, Dynamo DB without breaking the logic.
  - Independent of 3rd party library. No 3rd party library should be implemented directly to the system logic, we should abstract in away that our system can replace the library anytime we want.
 
 Every implementation should only be by using interface, there should be no direct access from the implementor to implementation, that way we can inject its dependency and replace it with mock object during unit tests. For example:
@@ -122,7 +122,7 @@ If you look into the implementation of these lines
 Both are actually abstract implementation of the interface, not the real implementation itself.
 So later on the Dependency Injection section, we will learn those interface will be injected with the implementation during the compile time. This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
 
-Throughout this repo you will find implementation of design patterns such as **Strategy Pattern** when we inject our dependencies with the real implementations, we create **Singleton** and use it to wired up our router and services, we use **Composite** for all our abstract interface implementations so that the implementor can abstractly implement the methods it has, we also use **Decorator Pattern** to hook up our circuit breaker without needing to change / modify the original implementation.
+Throughout this repo you will find implementation of design patterns such as **Strategy Pattern** when we inject our dependencies with the real implementations. We create **Singleton** and use it to wired up our router and services. We use **Composite** for all our abstract interface implementations so that the implementor can abstractly implement the methods it has, just as the example above where **PlayerService** implements **interfaces.IPlayerRepository** and allows our it to directly invoke **GetPlayerByName** which is **IPlayerRepository's** method.  We also use **Decorator Pattern** to hook up our circuit breaker without needing to change / modify the original implementation.
 
 ----------
 
