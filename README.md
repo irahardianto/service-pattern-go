@@ -122,7 +122,7 @@ If you look into the implementation of these lines
 Both are actually abstract implementation of the interface, not the real implementation itself.
 So later on the Dependency Injection section, we will learn those interface will be injected with the implementation during the compile time. This way, we can switch the implementation of IPlayerService & IPlayerRepository during the injection with whatever implementation without changing the implementation logic.
 
-Router that is used should only the one that **net/http** compatible, that way we can use **net/http/httptest** to unit test our controllers and be sure that we have proper implementation.
+Throughout this repo you will find implementation of design patterns such as **Strategy Pattern** when we inject our dependencies with the real implementations, we create **Singleton** and use it to wired up our router and services, we use **Composite** for all our abstract interface implementations so that the implementor can abstractly implement the methods it has, we also use **Decorator Pattern** to hook up our circuit breaker without needing to change / modify the original implementation.
 
 ----------
 
