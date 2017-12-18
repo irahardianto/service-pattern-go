@@ -156,8 +156,6 @@ Router that is used should only the one that **net/http** compatible, that way w
 [Folder Structure](https://irahardianto.github.io/service-pattern-go/#folder-structure)
 -------
     /
-    |- commands
-    |- configurations
     |- controllers
     |- helpers
     |- infrastructures
