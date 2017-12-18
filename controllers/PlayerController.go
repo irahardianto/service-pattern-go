@@ -4,15 +4,14 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/irahardianto/service-pattern-go/helpers"
 	"github.com/irahardianto/service-pattern-go/interfaces"
 
 	"github.com/go-chi/chi"
+	"github.com/irahardianto/service-pattern-go/viewmodels"
 )
 
 type PlayerController struct {
 	interfaces.IPlayerService
-	PlayerHelper  helpers.PlayerHelper
 }
 
 func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
@@ -25,7 +24,5 @@ func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req 
 		//Handle error
 	}
 
-	response := controller.PlayerHelper.BuildScoresVM(scores)
-
-	json.NewEncoder(res).Encode(response)
+	json.NewEncoder(res).Encode(viewmodels.ScoresVM{scores})
 }

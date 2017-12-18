@@ -74,29 +74,6 @@ The aim of the architecture is to produce a system that are:
 
 Every implementation should only be by using interface, there should be no direct access from the implementor to implementation, that way we can inject its dependency and replace it with mock object during unit tests. For example:
 
-PlayerController -> implement IPlayerService,  instead of direct PlayerService
-
-
-    type PlayerController struct {
-        interfaces.IPlayerService
-        PlayerHelper  helpers.PlayerHelper
-    }
-    
-    func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
-    
-        player1Name := chi.URLParam(req, "player1")
-        player2Name := chi.URLParam(req, "player2")
-    
-        scores, err := controller.GetScores(player1Name, player2Name)
-        if err != nil {
-            //Handle error
-        }
-    
-        response := controller.PlayerHelper.BuildScoresVM(scores)
-    
-        json.NewEncoder(res).Encode(response)
-    }
-
 PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
 
@@ -137,11 +114,7 @@ PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
       return result, nil
     }
     
-If you look into the implementation of this line in PlayerController
-
-    scores, err := controller.GetScores(player1Name, player2Name)
-
-And these lines in PlayerService
+If you look into the implementation of these lines
 
     player1, err := service.GetPlayerByName(player1Name)
     player2, err := service.GetPlayerByName(player2Name)
@@ -157,7 +130,6 @@ Router that is used should only the one that **net/http** compatible, that way w
 -------
     /
     |- controllers
-    |- helpers
     |- infrastructures
     |- interfaces
     |- models
@@ -178,9 +150,6 @@ controllers folder hosts all the structs under controllers namespace, controller
 
 controller struct implement services through their interface, no direct services implementation should be done in controller, this is done to maintain decoupled systems. The implementation will be injected during the compiled time.
 
-### helpers
-
-controllers folder hosts all the structs under controllers namespace
 
 ### infrasctructures
 
@@ -245,7 +214,6 @@ The when I learned about mocking, all that I have been asking coming to conclusi
 
     type PlayerController struct {
       interfaces.IPlayerService
-      PlayerHelper  helpers.PlayerHelper
     }
     
     func (controller *PlayerController) GetPlayerScore(res http.ResponseWriter, req *http.Request) {
@@ -258,9 +226,7 @@ The when I learned about mocking, all that I have been asking coming to conclusi
         //Handle error
       }
     
-      response := controller.PlayerHelper.BuildScoresVM(scores)
-    
-      json.NewEncoder(res).Encode(response)
+	  json.NewEncoder(res).Encode(viewmodels.ScoresVM{scores})
     }
 
 You see that PlayerController uses IPlayerService interface, and since IPlayerService has GetScores method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
@@ -279,7 +245,7 @@ You see, instead of calling directly to PlayerService, PlayerController uses the
 
 	  playerRepository := &repositories.PlayerRepository{sqliteHandler}
 	  playerService := &services.PlayerService{&repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}}
-	  playerController := controllers.PlayerController{playerService,helpers.PlayerHelper{}}
+	  playerController := controllers.PlayerController{playerService}
 
       return playerController
     }
@@ -309,7 +275,7 @@ We then create mock GetScores functionalities along with its request and respons
 
 As you see, then the mock object is injected to **playerService** of PlayerController, this is why dependency injection is essential to this proses as it is the only way we can inject interface with mock object instead of real implementation.
 
-	playerController := PlayerController{playerService, helpers.PlayerHelper{}}
+	playerController := PlayerController{playerService}
 
 We generate mock our by using vektra mockery for IPlayerService, go to the interfaces folder and then just type.
 
@@ -332,7 +298,7 @@ We have cover pretty much everything there is I hope that you already get the id
       // setup expectations
       playerService.On("GetScores", "Rafael", "Serena").Return("Forty-Fifteen", nil)
 
-	  playerController := PlayerController{playerService, helpers.PlayerHelper{}}
+	  playerController := PlayerController{playerService}
 
       // call the code we are testing
       req := httptest.NewRequest("GET", "http://localhost:8080/getScore/Rafael/vs/Serena", nil)
