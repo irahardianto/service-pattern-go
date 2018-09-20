@@ -39,6 +39,7 @@ Setup dependencies
     go get github.com/stretchr/testify
     go get github.com/vektra/mockery/.../
     go get github.com/afex/hystrix-go/hystrix
+    go get -u github.com/mattn/go-sqlite3
 
 Setup sqlite data structure
 
