@@ -77,7 +77,7 @@ Every implementation should only be by using interface, there should be no direc
 
 PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
-
+```go
     type PlayerService struct {
       interfaces.IPlayerRepository
     }
@@ -114,7 +114,7 @@ PlayerService -> implement IPlayerRepository, instead of direct PlayerRepository
 
       return result, nil
     }
-    
+```    
 If you look into the implementation of these lines
 
     player1, err := service.GetPlayerByName(player1Name)
@@ -212,7 +212,7 @@ Now why dependency injection is a crucial part in doing proper TDD? the answer l
 Some other people says that interface is used so your program is decoupled, and when needed you can replace the implementations without needing to adjust the implementor. That make sense right? much better than the bullshit. Yea that make sense, we can replace whatever implement whatever interface with whatever. Yea, but how many times would you replace you database connection calls? chances are rare if not never especially if you working on software house that deliver projects after projects after projects, you will never see you component got replaced.
 
 The when I learned about mocking, all that I have been asking coming to conclusions as if I was like having epiphany, we will discuss more about mocking in the mocking section, but for now lets discuss it in regards of dependency injection usage. So as you see in our project structure, instead of having all component directly talks to each other, we are using interface, take PlayerController for example
-
+```go
     type PlayerController struct {
       interfaces.IPlayerService
     }
@@ -229,15 +229,15 @@ The when I learned about mocking, all that I have been asking coming to conclusi
     
 	  json.NewEncoder(res).Encode(viewmodels.ScoresVM{scores})
     }
-
+```
 You see that PlayerController uses IPlayerService interface, and since IPlayerService has GetScores method, PlayerController can invoke it and get the result right away. Wait a minute, isn't that the interface is just merely abstraction? so how do it get executed, where is the implementation?
-
+```go
     type IPlayerService interface {
       GetScores(player1Name string, player2Name string) (string, error)
     }
-
+```
 You see, instead of calling directly to PlayerService, PlayerController uses the interface of PlayerService which is IPlayerService, there could be many implementation of IPlayerService not just limited to PlayerService it could be BrotherService etc, but how do we determined that PlayerService will be used instead?
-
+```go
     func (k *kernel) InjectPlayerController() controllers.PlayerController {
 
       sqlConn, _ := sql.Open("sqlite3", "/var/tmp/tennis.db")
@@ -250,7 +250,7 @@ You see, instead of calling directly to PlayerService, PlayerController uses the
 
       return playerController
     }
-
+```
 This is where dependency injection come in to play, as you see here in servicecontainer.go we are creating **playerController** and inject it with **playerService** as simple as that, this is what dependency injection all about no more. So **playerController's IPlayerService** will be injected by **playerService** along with all implementation that it implements, so for example **GetPlayerByName** now returns whatever **GetPlayerByName** implemented by **playerService** as you can see it in **PlayerService.go**
 
 Now, how does this relates to TDD & mocking?
@@ -267,21 +267,21 @@ You see, in PlayerController_test.go we are using mock object to inject the impl
 Mocking is a concept many times people struggle to understand, let alone implement it, at least I was the one among the one who struggles to understand this concept. But understanding this concept is essential to do TDD. The key point is, we mock dependencies that we need to run our tests, this is why dependency injection is essential to proceed. We are using testfy as our mock library
 
 Basically what mock object do is replacing injection instead of real implementation with mock as point out at the end of dependency injection session
-
+```go
     playerService := new(mocks.IPlayerService)
-
+```
 We then create mock GetScores functionalities along with its request and response.
-
+```go
     playerService.On("GetScores", "Rafael", "Serena").Return("Forty-Fifteen", nil)
-
+```
 As you see, then the mock object is injected to **playerService** of PlayerController, this is why dependency injection is essential to this proses as it is the only way we can inject interface with mock object instead of real implementation.
-
+```go
 	playerController := PlayerController{playerService}
-
+```
 We generate mock our by using vektra mockery for IPlayerService, go to the interfaces folder and then just type.
-
+```go
     mockery -name=IPlayerService
-
+```
 The output will be inside ```mocks/IPlayerService.go``` and we can use it right away for our testing.
 
 ----------
@@ -290,7 +290,7 @@ The output will be inside ```mocks/IPlayerService.go``` and we can use it right 
 -------
 
 We have cover pretty much everything there is I hope that you already get the idea of proper unit testing and why we should implement interfaces, dependency injection and mocking. The last piece is the unit test itself.
-
+```go
     func TestPlayerScore(t *testing.T) {
 
       // create an instance of our test object
@@ -320,9 +320,9 @@ We have cover pretty much everything there is I hope that you already get the id
       // assert that the expectations were met
       assert.Equal(t, expectedResult, actualResult)
     }
-
+```
  As you see here after injecting playerService of playerController with mock object, we are calling the playerController.GetPlayer and simulate request all the way from the router.
-
+```go
      req := httptest.NewRequest("GET", "http://localhost:8080/getScore/Rafael/vs/Serena", nil)
      w := httptest.NewRecorder()
 
@@ -330,11 +330,11 @@ We have cover pretty much everything there is I hope that you already get the id
      r.HandleFunc("/getScore/{player1}/vs/{player2}", playerController.GetPlayerScore)
 
      r.ServeHTTP(w, req)
-
+```
 And assert the result by using testify assertion library
-
+```go
     assert.Equal(t, expectedResult, actualResult)
-
+```
 ----------
 
 [Circuit Breaker](https://irahardianto.github.io/service-pattern-go/#circuit-breaker)
@@ -354,12 +354,12 @@ For the sake of SOLID principles implementation in our codebase, we will add hys
 
 
 If you recall we inject our PlayerService with PlayerRepositoryWithCircuitBreaker and the original PlayerRepository wrapped inside.
-
+```go
 	playerService.PlayerRepository = &repositories.PlayerRepositoryWithCircuitBreaker{playerRepository}
-
+```    
 
 Base PlayerRepository implementation :
-
+```go
 	type PlayerRepository struct {
       interfaces.IDbHandler
 	}
@@ -378,9 +378,9 @@ Base PlayerRepository implementation :
 
       return player, nil
 	}
-
+```
 PlayerRepository extension implementation :
-
+```go
     type PlayerRepositoryWithCircuitBreaker struct {
       PlayerRepository interfaces.IPlayerRepository
     }
@@ -405,13 +405,13 @@ PlayerRepository extension implementation :
         return models.PlayerModel{}, err
       }
     }
-
+```
 Basically PlayerRepositoryWithCircuitBreaker implement the same interface as PlayerRepository, IPlayerRepository
-
+```go
     type IPlayerRepository interface {
       GetPlayerByName(name string) (models.PlayerModel, error)
     }
-
+```
 
 As you see here, it is very easy to implement hystrix-go circuit breaker, you just need to wrap your db call inside hystrix if the timeout reached, the circuit breaker will be tripped and all calls to database will be halt, error will be returned instead for future call until db service is up and healthy.
 
